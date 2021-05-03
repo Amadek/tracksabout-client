@@ -10,6 +10,7 @@ export default class App extends React.Component {
     this.handleFilesChange = this._handleFilesChange.bind(this);
     this.handleSubmitFiles = this._handleSubmitFiles.bind(this);
     this._files = [];
+    this.state = { isSubmitDisabled: false };
   }
 
   render () {
@@ -18,7 +19,7 @@ export default class App extends React.Component {
         <p>TracksAbout</p>
         <form onSubmit={this.handleSubmitFiles}>
           <input type='file' multiple onChange={this.handleFilesChange} />
-          <input type='submit' />
+          <input type='submit' disabled={this.state.isSubmitDisabled} />
         </form>
       </div>
     );
@@ -34,21 +35,27 @@ export default class App extends React.Component {
 
     try {
       this._logger.log(this, 'Uploading files...');
+      this.setState({ isSubmitDisabled: true });
+
       if (this._files.length === 0) throw new Error('No files selected.');
 
       const formData = new FormData();
-      for (const file in this._files) {
-        formData.append('tracks', file);
+      for (let fileIndex = 0; fileIndex < this._files.length; fileIndex++) {
+        formData.append('tracks', this._files[fileIndex]);
       }
 
-      await fetch('http://localhost:4000/track', {
+      const response = await fetch('http://localhost:4000/track', {
         method: 'POST',
         body: formData
       });
 
-      this._logger.log('Files uploaded.');
+      if (!response.ok) throw new Error(response.statusText);
+
+      this._logger.log(this, 'Files uploaded.');
     } catch (error) {
       this._logger.log(this, error);
+    } finally {
+      this.setState({ isSubmitDisabled: false });
     }
   }
 }
