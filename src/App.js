@@ -2,35 +2,50 @@
 /* eslint no-redeclare: 'off' */
 import React from 'react';
 import Logger from './Logger';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Navbar from './Navbar';
+import LoadingTrack from './LoadingTrack';
+import FileBox from './FileBox';
+import ProcessTracksButton from './ProcessTracksButton';
 
 export default class App extends React.Component {
   constructor () {
     super();
     this._logger = new Logger();
     this.handleFilesChange = this._handleFilesChange.bind(this);
-    this.handleSubmitFiles = this._handleSubmitFiles.bind(this);
+    this.handleUploadButtonClick = this._handleUploadButtonClick.bind(this);
+    this.handleFileBoxClick = this._handleFileBoxClick.bind(this);
     this._files = [];
-    this.state = { isSubmitDisabled: false };
+    this.state = { isSubmitDisabled: false, loadingTracks: [] };
   }
 
   render () {
     return (
-      <div>
-        <p>TracksAbout</p>
-        <form onSubmit={this.handleSubmitFiles}>
-          <input type='file' multiple onChange={this.handleFilesChange} />
-          <input type='submit' disabled={this.state.isSubmitDisabled} />
-        </form>
-      </div>
+      <>
+        <Navbar />
+        <div className='container'>
+          <FileBox onFileBoxClick={this.handleFileBoxClick} />
+          {this.state.loadingTracks}
+          <ProcessTracksButton fileInputRef={fileInput => { this._fileInput = fileInput; }} onFilesChange={this.handleFilesChange} onProcessTracksButtonClick={this.handleUploadButtonClick} />
+        </div>
+      </>
     );
   }
 
   _handleFilesChange (event) {
     this._files = event.target.files;
     this._logger.log(this, `Files changed, count ${this._files.length}.`);
+
+    const loadingTracks = [];
+    for (let fileIndex = 0; fileIndex < this._files.length; fileIndex++) {
+      const loadingTrack = <LoadingTrack key={fileIndex} fileName={this._files[fileIndex].name} showBorder={fileIndex !== 0} />;
+      loadingTracks.push(loadingTrack);
+    }
+
+    this.setState({ loadingTracks });
   }
 
-  async _handleSubmitFiles (event) {
+  async _handleUploadButtonClick (event) {
     event.preventDefault();
 
     try {
@@ -56,6 +71,15 @@ export default class App extends React.Component {
       this._logger.log(this, error);
     } finally {
       this.setState({ isSubmitDisabled: false });
+    }
+  }
+
+  _handleFileBoxClick () {
+    try {
+      if (!this._fileInput) throw new Error('File input reference not set.');
+      this._fileInput.click();
+    } catch (error) {
+      this._logger.log(this, error);
     }
   }
 }
