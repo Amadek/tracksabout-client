@@ -12,6 +12,7 @@ export default class App extends React.Component {
   constructor () {
     super();
     this._logger = new Logger();
+    this.handleDropToFileBox = this._handleDropToFileBox.bind(this);
     this.handleFilesChange = this._handleFilesChange.bind(this);
     this.handleUploadButtonClick = this._handleUploadButtonClick.bind(this);
     this.handleFileBoxClick = this._handleFileBoxClick.bind(this);
@@ -24,22 +25,41 @@ export default class App extends React.Component {
       <>
         <Navbar />
         <div className='container'>
-          <FileBox onFileBoxClick={this.handleFileBoxClick} />
+          <FileBox onFileBoxClick={this.handleFileBoxClick} onDropToFileBox={this.handleDropToFileBox} />
           {this.state.loadingTracks}
-          <ProcessTracksButton fileInputRef={fileInput => { this._fileInput = fileInput; }} onFilesChange={this.handleFilesChange} onProcessTracksButtonClick={this.handleUploadButtonClick} />
+          <ProcessTracksButton
+            fileInputRef={fileInput => { this._fileInput = fileInput; }}
+            onFilesChange={this.handleFilesChange}
+            onProcessTracksButtonClick={this.handleUploadButtonClick}
+            processTracksButtonDisabled={this.state.isSubmitDisabled}
+          />
         </div>
       </>
     );
   }
 
+  _handleDropToFileBox (event) {
+    event.preventDefault();
+    this._loadTracks(event.dataTransfer.files);
+  }
+
   _handleFilesChange (event) {
-    this._files = event.target.files;
+    this._loadTracks(event.target.files);
+  }
+
+  _loadTracks (files) {
+    this._files = files;
     this._logger.log(this, `Files changed, count ${this._files.length}.`);
 
     const loadingTracks = [];
     for (let fileIndex = 0; fileIndex < this._files.length; fileIndex++) {
-      const loadingTrack = <LoadingTrack key={fileIndex} fileName={this._files[fileIndex].name} showBorder={fileIndex !== 0} />;
-      loadingTracks.push(loadingTrack);
+      loadingTracks.push(
+        <LoadingTrack
+          key={fileIndex}
+          fileName={this._files[fileIndex].name}
+          showBorder={fileIndex !== 0}
+        />
+      );
     }
 
     this.setState({ loadingTracks });

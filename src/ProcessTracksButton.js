@@ -11,7 +11,7 @@ export default class ProcessTracksButton extends React.Component {
           />
           <button
             type='button' className='btn btn-lg btn-primary'
-            /* disabled={this.state.isSubmitDisabled} */ onClick={this.props.onProcessTracksButtonClick}
+            disabled={this.props.processTracksButtonDisabled} onClick={this.props.onProcessTracksButtonClick}
           >
             Upload tracks
           </button>
