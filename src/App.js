@@ -16,19 +16,30 @@ export default class App extends React.Component {
     this.handleFilesChange = this._handleFilesChange.bind(this);
     this.handleUploadButtonClick = this._handleUploadButtonClick.bind(this);
     this.handleFileBoxClick = this._handleFileBoxClick.bind(this);
-    this._files = [];
-    this.state = { isSubmitDisabled: false, loadingTracks: [] };
+    this.state = { files: [], isSubmitDisabled: false };
   }
 
   render () {
+    const loadingTracks = this.state.files.map((file, index) =>
+      <LoadingTrack
+        key={index}
+        fileName={file.name}
+        showBorder={index !== 0}
+        processingMessage={file.state}
+      />
+    );
+
     return (
       <>
         <Navbar />
         <div className='container'>
+          <input
+            type='file' className='visually-hidden' accept='audio/flac'
+            multiple ref={fileInput => { this._fileInput = fileInput; }} onChange={this.handleFilesChange}
+          />
           <FileBox onFileBoxClick={this.handleFileBoxClick} onDropToFileBox={this.handleDropToFileBox} />
-          {this.state.loadingTracks}
+          {loadingTracks}
           <ProcessTracksButton
-            fileInputRef={fileInput => { this._fileInput = fileInput; }}
             onFilesChange={this.handleFilesChange}
             onProcessTracksButtonClick={this.handleUploadButtonClick}
             processTracksButtonDisabled={this.state.isSubmitDisabled}
@@ -39,30 +50,36 @@ export default class App extends React.Component {
   }
 
   _handleDropToFileBox (event) {
-    event.preventDefault();
-    this._loadTracks(event.dataTransfer.files);
+    try {
+      event.preventDefault();
+      this._loadTracks(event.dataTransfer.files);
+    } catch (error) {
+      this._logger.log(this, error);
+    }
   }
 
   _handleFilesChange (event) {
-    this._loadTracks(event.target.files);
+    try {
+      this._loadTracks(event.target.files);
+    } catch (error) {
+      this._logger.log(this, error);
+    }
   }
 
   _loadTracks (files) {
-    this._files = files;
-    this._logger.log(this, `Files changed, count ${this._files.length}.`);
+    this._logger.log(this, `Files changed, count ${files.length}.`);
 
-    const loadingTracks = [];
-    for (let fileIndex = 0; fileIndex < this._files.length; fileIndex++) {
-      loadingTracks.push(
-        <LoadingTrack
-          key={fileIndex}
-          fileName={this._files[fileIndex].name}
-          showBorder={fileIndex !== 0}
-        />
-      );
+    // files is not a normal array, so we map it.
+    const filesArray = [];
+    for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
+      const file = files[fileIndex];
+      file.state = 'parsing';
+      filesArray.push(files[fileIndex]);
     }
 
-    this.setState({ loadingTracks });
+    this.setState({ files: filesArray });
+
+    // TODO parsowanie tracków.
   }
 
   async _handleUploadButtonClick (event) {
@@ -72,11 +89,11 @@ export default class App extends React.Component {
       this._logger.log(this, 'Uploading files...');
       this.setState({ isSubmitDisabled: true });
 
-      if (this._files.length === 0) throw new Error('No files selected.');
+      if (this.state.files.length === 0) throw new Error('No files selected.');
 
       const formData = new FormData();
-      for (let fileIndex = 0; fileIndex < this._files.length; fileIndex++) {
-        formData.append('tracks', this._files[fileIndex]);
+      for (let fileIndex = 0; fileIndex < this.state.files.length; fileIndex++) {
+        formData.append('tracks', this.state.files[fileIndex]);
       }
 
       const response = await fetch('http://localhost:4000/track', {

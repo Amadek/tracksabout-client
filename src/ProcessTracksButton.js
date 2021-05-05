@@ -5,10 +5,6 @@ export default class ProcessTracksButton extends React.Component {
     return (
       <div className='row'>
         <div className='col d-grid p-0 pt-2'>
-          <input
-            type='file' className='visually-hidden' accept='audio/flac'
-            multiple ref={this.props.fileInputRef} onChange={this.props.onFilesChange}
-          />
           <button
             type='button' className='btn btn-lg btn-primary'
             disabled={this.props.processTracksButtonDisabled} onClick={this.props.onProcessTracksButtonClick}
