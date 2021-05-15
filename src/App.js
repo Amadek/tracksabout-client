@@ -6,6 +6,7 @@ import LoadingTrack from './LoadingTrack';
 import FileBox from './FileBox';
 import ProcessTracksButton from './ProcessTracksButton';
 import TracksAboutApiClient from './TracksAboutApiClient';
+import assert from 'assert';
 
 export default class App extends React.Component {
   constructor () {
@@ -29,9 +30,9 @@ export default class App extends React.Component {
         key={index}
         fileName={file.name}
         showBorder={index !== 0}
-        processingMessage={file.state}
-        trackParsed={file.trackParsed}
+        state={file.state}
         track={file.track}
+        errorMessage={file.errorMessage}
       />
     );
 
@@ -59,53 +60,57 @@ export default class App extends React.Component {
     );
   }
 
-  _handleDropToFileBox (event) {
+  async _handleDropToFileBox (event) {
     try {
       event.preventDefault();
-      this._loadTracks(event.dataTransfer.files);
+      await this._loadTracks(event.dataTransfer.files);
     } catch (error) {
       this._logger.log(this, error);
     }
   }
 
-  _handleFilesChange (event) {
+  async _handleFilesChange (event) {
     try {
-      this._loadTracks(event.target.files);
+      await this._loadTracks(event.target.files);
     } catch (error) {
       this._logger.log(this, error);
     }
   }
 
-  async _loadTracks (files) {
-    try {
-      this._logger.log(this, `Files changed, count ${files.length}.`);
+  async _loadTracks (rawFilesArray) {
+    assert.ok(rawFilesArray);
+    this._logger.log(this, `Files changed, count ${rawFilesArray.length}.`);
 
-      // files is not a normal array, so we map it.
-      const filesArray = [];
-      for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
-        const file = files[fileIndex];
-        file.state = 'parsing';
-        filesArray.push(files[fileIndex]);
+    // rawFilesArray is not a normal array, so we map it.
+    const files = [];
+    for (const file of rawFilesArray) {
+      file.state = 'parsing';
+      files.push(file);
+    }
+
+    this.setState({ files });
+
+    for (const file of files) {
+      const parseTrackResult = await this._tracksAboutApiClient.parseTrack(file);
+
+      if (!parseTrackResult.success) {
+        file.state = 'error';
+        file.errorMessage = parseTrackResult.message;
+        // Even when API returns error, it could parse file to track.
+        file.track = parseTrackResult.parsedTrack;
+        this.setState({ files });
+        continue;
       }
 
-      this.setState({ files: filesArray });
-
-      for (let fileIndex = 0; fileIndex < filesArray.length; fileIndex++) {
-        const parseTrackResult = await this._tracksAboutApiClient.parseTrack(filesArray[fileIndex]);
-        filesArray[fileIndex].trackParsed = true;
-        filesArray[fileIndex].track = parseTrackResult.parsedTrack;
-        filesArray[fileIndex].state = 'parsed';
-        this.setState({ files: filesArray });
-      }
-    } catch (error) {
-      this._logger.log(this, error);
+      file.state = 'parsed';
+      file.track = parseTrackResult.parsedTrack;
+      this.setState({ files });
     }
   }
 
   async _handleUploadButtonClick (event) {
-    event.preventDefault();
-
     try {
+      event.preventDefault();
       this._logger.log(this, 'Uploading files...');
       this.setState({ isSubmitDisabled: true });
 

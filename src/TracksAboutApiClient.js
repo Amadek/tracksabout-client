@@ -10,7 +10,7 @@ export default class TracksAboutApiClient {
 
   async parseTrack (file) {
     assert.ok(file);
-    this._logger.log(this, 'Parsing file started.');
+    this._logger.log(this, 'Validating file started.');
     const formData = new FormData();
     formData.append('tracks', file);
 
@@ -20,11 +20,15 @@ export default class TracksAboutApiClient {
         body: formData
       });
 
-      if (!response.ok) throw new Error(response.statusText);
+      if (!response.ok) {
+        const validateTrackError = await response.json();
+        this._logger.log(this, 'Validating failed:\n' + JSON.stringify(validateTrackError, null, 2));
+        return { success: false, message: validateTrackError.message, parsedTrack: validateTrackError.additionalData?.parsedTrack };
+      }
 
       const parsedTrack = await response.json();
 
-      this._logger.log(this, 'Parsing completed:\n' + JSON.stringify(parsedTrack, null, 2));
+      this._logger.log(this, 'Validating completed:\n' + JSON.stringify(parsedTrack, null, 2));
       return { success: true, parsedTrack };
     } catch (error) {
       this._logger.log(this, error);
