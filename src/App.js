@@ -30,6 +30,8 @@ export default class App extends React.Component {
         fileName={file.name}
         showBorder={index !== 0}
         processingMessage={file.state}
+        trackParsed={file.trackParsed}
+        track={file.track}
       />
     );
 
@@ -74,20 +76,30 @@ export default class App extends React.Component {
     }
   }
 
-  _loadTracks (files) {
-    this._logger.log(this, `Files changed, count ${files.length}.`);
+  async _loadTracks (files) {
+    try {
+      this._logger.log(this, `Files changed, count ${files.length}.`);
 
-    // files is not a normal array, so we map it.
-    const filesArray = [];
-    for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
-      const file = files[fileIndex];
-      file.state = 'parsing';
-      filesArray.push(files[fileIndex]);
+      // files is not a normal array, so we map it.
+      const filesArray = [];
+      for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
+        const file = files[fileIndex];
+        file.state = 'parsing';
+        filesArray.push(files[fileIndex]);
+      }
+
+      this.setState({ files: filesArray });
+
+      for (let fileIndex = 0; fileIndex < filesArray.length; fileIndex++) {
+        const parseTrackResult = await this._tracksAboutApiClient.parseTrack(filesArray[fileIndex]);
+        filesArray[fileIndex].trackParsed = true;
+        filesArray[fileIndex].track = parseTrackResult.parsedTrack;
+        filesArray[fileIndex].state = 'parsed';
+        this.setState({ files: filesArray });
+      }
+    } catch (error) {
+      this._logger.log(this, error);
     }
-
-    this.setState({ files: filesArray });
-
-    // TODO parsowanie tracków.
   }
 
   async _handleUploadButtonClick (event) {
