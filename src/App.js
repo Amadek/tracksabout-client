@@ -1,5 +1,3 @@
-/* global FormData, fetch */
-/* eslint no-redeclare: 'off' */
 import React from 'react';
 import Logger from './Logger';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -7,16 +5,22 @@ import Navbar from './Navbar';
 import LoadingTrack from './LoadingTrack';
 import FileBox from './FileBox';
 import ProcessTracksButton from './ProcessTracksButton';
+import TracksAboutApiClient from './TracksAboutApiClient';
 
 export default class App extends React.Component {
   constructor () {
     super();
     this._logger = new Logger();
+    this._tracksAboutApiClient = new TracksAboutApiClient(new Logger());
     this.handleDropToFileBox = this._handleDropToFileBox.bind(this);
     this.handleFilesChange = this._handleFilesChange.bind(this);
     this.handleUploadButtonClick = this._handleUploadButtonClick.bind(this);
     this.handleFileBoxClick = this._handleFileBoxClick.bind(this);
-    this.state = { files: [], isSubmitDisabled: false };
+    this.state = {
+      files: [],
+      isSubmitDisabled: false,
+      uploadingTracksErrorMessage: ''
+    };
   }
 
   render () {
@@ -33,6 +37,10 @@ export default class App extends React.Component {
       <>
         <Navbar />
         <div className='container'>
+          {this.state.uploadingTracksErrorMessage &&
+            <div className='row'>
+              <div className='alert alert-danger m-0 mt-3'>{this.state.uploadingTracksErrorMessage}</div>
+            </div>}
           <input
             type='file' className='visually-hidden' accept='audio/flac'
             multiple ref={fileInput => { this._fileInput = fileInput; }} onChange={this.handleFilesChange}
@@ -91,21 +99,18 @@ export default class App extends React.Component {
 
       if (this.state.files.length === 0) throw new Error('No files selected.');
 
-      const formData = new FormData();
-      for (let fileIndex = 0; fileIndex < this.state.files.length; fileIndex++) {
-        formData.append('tracks', this.state.files[fileIndex]);
+      const uploadTracksResult = await this._tracksAboutApiClient.uploadTracks(this.state.files);
+      if (!uploadTracksResult.success) {
+        this.setState({ uploadingTracksErrorMessage: uploadTracksResult.message });
+        this._logger.log(this, 'Files upload fail.');
+        return;
       }
 
-      const response = await fetch('http://localhost:4000/track', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) throw new Error(response.statusText);
-
-      this._logger.log(this, 'Files uploaded.');
+      this.setState({ uploadingTracksErrorMessage: '' });
+      this._logger.log(this, 'Files upload success.');
     } catch (error) {
-      this._logger.log(this, error);
+      this.setState({ uploadingTracksErrorMessage: error.message });
+      this._logger.log(this, 'Files upload fail.\n' + error);
     } finally {
       this.setState({ isSubmitDisabled: false });
     }
