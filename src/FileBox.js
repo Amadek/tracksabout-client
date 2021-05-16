@@ -11,7 +11,7 @@ export default class FileBox extends React.Component {
   render () {
     return (
       <div className='row'>
-        <div className='col p-0 pt-3 pb-2'>
+        <div className='col p-0 pt-4 pb-2'>
           <div
             className={'border m-0 p-5' + (this.state.fileOverFileBox ? ' border-4' : '')} role='button'
             onClick={this.props.onFileBoxClick} onDrop={this.props.onDropToFileBox} onDragOver={this.handleDragOverFileBox} onDragLeave={this.handleDragLeaveFileBox}

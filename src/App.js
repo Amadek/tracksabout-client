@@ -54,6 +54,7 @@ export default class App extends React.Component {
             onFilesChange={this.handleFilesChange}
             onProcessTracksButtonClick={this.handleUploadButtonClick}
             processTracksButtonDisabled={this.state.isSubmitDisabled}
+            errorOccured={this.state.submitErrorOccured}
           />
         </div>
       </>
@@ -90,6 +91,9 @@ export default class App extends React.Component {
 
     this.setState({ files });
 
+    let isSubmitDisabled = false;
+    let submitErrorOccured = false;
+
     for (const file of files) {
       const parseTrackResult = await this._tracksAboutApiClient.parseTrack(file);
 
@@ -99,6 +103,9 @@ export default class App extends React.Component {
         // Even when API returns error, it could parse file to track.
         file.track = parseTrackResult.parsedTrack;
         this.setState({ files });
+
+        isSubmitDisabled = true;
+        submitErrorOccured = true;
         continue;
       }
 
@@ -106,6 +113,8 @@ export default class App extends React.Component {
       file.track = parseTrackResult.parsedTrack;
       this.setState({ files });
     }
+
+    this.setState({ isSubmitDisabled, submitErrorOccured });
   }
 
   async _handleUploadButtonClick (event) {

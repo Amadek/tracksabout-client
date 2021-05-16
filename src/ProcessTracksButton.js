@@ -6,7 +6,7 @@ export default class ProcessTracksButton extends React.Component {
       <div className='row'>
         <div className='col d-grid p-0 pt-2'>
           <button
-            type='button' className='btn btn-lg btn-primary'
+            type='button' className={'btn btn-lg' + (this.props.errorOccured ? ' btn-danger' : ' btn-primary')}
             disabled={this.props.processTracksButtonDisabled} onClick={this.props.onProcessTracksButtonClick}
           >
             Upload tracks
