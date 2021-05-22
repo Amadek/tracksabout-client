@@ -1,18 +1,11 @@
 import React from 'react';
+import TrackState from './TrackState';
 
 export default class LoadingTrack extends React.Component {
   constructor () {
     super();
-    this._stateMessages = {
-      parsing: 'Parsing...',
-      parsed: 'Parsed',
-      error: 'Error'
-    };
-    this._stateTextStyle = {
-      parsing: 'text-dark',
-      parsed: 'text-success',
-      error: 'text-danger'
-    };
+    this._loadingMessages = this._createLoadingMessages();
+    this._textColors = this._createTextColors();
   }
 
   render () {
@@ -28,19 +21,49 @@ export default class LoadingTrack extends React.Component {
               <li>Year: {this.props.track.year}</li>
               <li>Mimetype: {this.props.track.mimetype}</li>
             </ul>}
-          {this.props.state === 'error' &&
+          {this.props.state === TrackState.error &&
             <p className='text-danger mt-2'>{this.props.errorMessage}</p>}
           {this.props.errorOccured}
         </div>
         <div className='col-2 d-flex align-items-center '>
-          <div className={'spinner-border me-3' + (this._checkIfSpinnerShouldBeShown() ? '' : ' visually-hidden')} />
-          <strong className={this._stateTextStyle[this.props.state]}>{this._stateMessages[this.props.state]}</strong>
+          {this.props.state === TrackState.parsing && <div className='spinner-border me-3' />}
+          <strong className={this._textColors[this.props.state]}>{this._loadingMessages[this.props.state]}</strong>
         </div>
       </div>
     );
   }
 
-  _checkIfSpinnerShouldBeShown () {
-    return this.props.state === 'parsing';
+  _createLoadingMessages () {
+    const loadingMessages = {
+      [TrackState.none]: '',
+      [TrackState.parsing]: 'Parsing...',
+      [TrackState.parsed]: 'Parsed',
+      [TrackState.uploading]: 'Parsed',
+      [TrackState.uploaded]: 'Parsed',
+      [TrackState.error]: 'Error'
+    };
+
+    for (const trackState in TrackState) {
+      if (loadingMessages[trackState] === undefined) throw new Error(`Not supported track state: ${trackState}`);
+    }
+
+    return loadingMessages;
+  }
+
+  _createTextColors () {
+    const textColors = {
+      [TrackState.none]: 'text-dark',
+      [TrackState.parsing]: 'text-dark',
+      [TrackState.parsed]: 'text-success',
+      [TrackState.uploading]: 'text-success',
+      [TrackState.uploaded]: 'text-success',
+      [TrackState.error]: 'text-danger'
+    };
+
+    for (const trackState in TrackState) {
+      if (!textColors[trackState] === undefined) throw new Error(`Not supported track state: ${trackState}`);
+    }
+
+    return textColors;
   }
 }

@@ -7,6 +7,7 @@ import FileBox from './FileBox';
 import ProcessTracksButton from './ProcessTracksButton';
 import TracksAboutApiClient from './TracksAboutApiClient';
 import assert from 'assert';
+import TrackState from './TrackState';
 
 export default class App extends React.Component {
   constructor () {
@@ -19,8 +20,8 @@ export default class App extends React.Component {
     this.handleFileBoxClick = this._handleFileBoxClick.bind(this);
     this.state = {
       files: [],
-      isSubmitDisabled: false,
-      uploadingTracksErrorMessage: ''
+      uploadingTracksErrorMessage: '',
+      uploadTracksButtonState: TrackState.none
     };
   }
 
@@ -52,9 +53,8 @@ export default class App extends React.Component {
           {loadingTracks}
           <ProcessTracksButton
             onFilesChange={this.handleFilesChange}
-            onProcessTracksButtonClick={this.handleUploadButtonClick}
-            processTracksButtonDisabled={this.state.isSubmitDisabled}
-            errorOccured={this.state.submitErrorOccured}
+            onClick={this.handleUploadButtonClick}
+            state={this.state.uploadTracksButtonState}
           />
         </div>
       </>
@@ -82,63 +82,62 @@ export default class App extends React.Component {
     assert.ok(rawFilesArray);
     this._logger.log(this, `Files changed, count ${rawFilesArray.length}.`);
 
-    // rawFilesArray is not a normal array, so we map it.
-    const files = [];
-    for (const file of rawFilesArray) {
-      file.state = 'parsing';
-      files.push(file);
-    }
-
-    this.setState({ files });
-
-    let isSubmitDisabled = false;
-    let submitErrorOccured = false;
-
-    for (const file of files) {
-      const parseTrackResult = await this._tracksAboutApiClient.parseTrack(file);
-
-      if (!parseTrackResult.success) {
-        file.state = 'error';
-        file.errorMessage = parseTrackResult.message;
-        // Even when API returns error, it could parse file to track.
-        file.track = parseTrackResult.parsedTrack;
-        this.setState({ files });
-
-        isSubmitDisabled = true;
-        submitErrorOccured = true;
-        continue;
+    try {
+      // rawFilesArray is not a normal array, so we map it.
+      const files = [];
+      for (const file of rawFilesArray) {
+        file.state = TrackState.parsing;
+        files.push(file);
       }
 
-      file.state = 'parsed';
-      file.track = parseTrackResult.parsedTrack;
-      this.setState({ files });
-    }
+      this.setState({ files, uploadTracksButtonState: TrackState.parsing });
 
-    this.setState({ isSubmitDisabled, submitErrorOccured });
+      let uploadTracksButtonState = TrackState.parsed;
+      for (const file of files) {
+        const parseTrackResult = await this._tracksAboutApiClient.parseTrack(file);
+
+        if (!parseTrackResult.success) {
+          file.state = TrackState.error;
+          file.errorMessage = parseTrackResult.message;
+          uploadTracksButtonState = TrackState.error;
+          // Even when API returns error, it could parse file to track.
+          file.track = parseTrackResult.parsedTrack;
+          this.setState({ files });
+          continue;
+        }
+
+        file.state = TrackState.parsed;
+        file.track = parseTrackResult.parsedTrack;
+        this.setState({ files });
+      }
+
+      this.setState({ uploadTracksButtonState });
+    } catch (error) {
+      this.setState({ uploadTracksButtonState: TrackState.error });
+      throw error;
+    }
   }
 
   async _handleUploadButtonClick (event) {
     try {
       event.preventDefault();
       this._logger.log(this, 'Uploading files...');
-      this.setState({ isSubmitDisabled: true });
+      this.setState({ uploadTracksButtonState: TrackState.uploading });
 
       if (this.state.files.length === 0) throw new Error('No files selected.');
 
       const uploadTracksResult = await this._tracksAboutApiClient.uploadTracks(this.state.files);
       if (!uploadTracksResult.success) {
-        this.setState({ uploadingTracksErrorMessage: uploadTracksResult.message });
+        this.setState({ uploadTracksButtonState: TrackState.error, uploadingTracksErrorMessage: uploadTracksResult.message });
         this._logger.log(this, 'Files upload fail.');
         return;
       }
 
-      this.setState({ uploadingTracksErrorMessage: '' });
+      this.setState({ uploadTracksButtonState: TrackState.uploaded, uploadingTracksErrorMessage: '' });
       this._logger.log(this, 'Files upload success.');
     } catch (error) {
-      this.setState({ uploadingTracksErrorMessage: error.message });
+      this.setState({ uploadTracksButtonState: TrackState.error, uploadingTracksErrorMessage: error.message });
       this._logger.log(this, 'Files upload fail.\n' + error);
-    } finally {
-      this.setState({ isSubmitDisabled: false });
     }
   }
 
