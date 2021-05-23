@@ -11,6 +11,7 @@ export default class TracksAboutApiClient {
   async parseTrack (file) {
     assert.ok(file);
     this._logger.log(this, 'Validating file started.');
+
     const formData = new FormData();
     formData.append('tracks', file);
 
@@ -38,10 +39,11 @@ export default class TracksAboutApiClient {
 
   async uploadTracks (files) {
     assert.ok(files);
+    this._logger.log(this, 'Uploading files started.');
 
     const formData = new FormData();
-    for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
-      formData.append('tracks', files[fileIndex]);
+    for (const file of files) {
+      formData.append('tracks', file);
     }
 
     try {
@@ -50,7 +52,13 @@ export default class TracksAboutApiClient {
         body: formData
       });
 
-      if (!response.ok) throw new Error(response.statusText);
+      if (!response.ok) {
+        const uploadTracksError = await response.json();
+        this._logger.log(this, 'Uploading failed:\n' + JSON.stringify(uploadTracksError, null, 2));
+        return { success: false, message: uploadTracksError.message };
+      }
+
+      this._logger.log(this, 'Uploading files completed.');
       return { success: true };
     } catch (error) {
       this._logger.log(this, error);
