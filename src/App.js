@@ -5,6 +5,8 @@ import UploadTrackTab from './UploadTrackTab/UploadTrackTab';
 import Logger from './Logger';
 import assert from 'assert';
 import NavBarState from './Navbar/NavbarState';
+import SearchTab from './SearchTab/SearchTab';
+import TracksAboutApiClient from './TracksAboutApiClient';
 
 export default class App extends React.Component {
   constructor () {
@@ -22,19 +24,22 @@ export default class App extends React.Component {
       <>
         <Navbar onNavItemClick={this.handleNavItemClick} />
         <Breadcrumb />
-        {this.getTab(this.state.navBarState)}
+        {this._getTab(this.state.navBarState)}
       </>
     );
   }
 
-  getTab (navBarState) {
+  _getTab (navBarState) {
     switch (navBarState) {
       case NavBarState.home:
       case NavBarState.upload:
         return <UploadTrackTab />;
 
       case NavBarState.search:
-        return <p>SEARCH</p>;
+        return <SearchTab tracksAboutApiClient={new TracksAboutApiClient(new Logger())} />;
+
+      default:
+        throw new Error(`NavBarState not supported: ${navBarState}`);
     }
   }
 

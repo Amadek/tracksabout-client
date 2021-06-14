@@ -65,4 +65,29 @@ export default class TracksAboutApiClient {
       return { success: false, message: error.message };
     }
   }
+
+  async search (searchPhrase) {
+    assert.ok(searchPhrase);
+    this._logger.log(this, `Searching for phrase: ${searchPhrase} started.`);
+
+    try {
+      const response = await fetch(`${this._tracksAboutApiUrl}/search/${searchPhrase}`, {
+        method: 'POST' // TODO zmienić z POST na GET, nie ma potrzeby korzystać z GET, GET jest bardziej intuicyjny tutaj.
+      });
+
+      if (!response.ok) {
+        const searchError = await response.json();
+        this._logger.log(this, 'Search failed:\n' + JSON.stringify(searchError, null, 2));
+        return { success: false, message: searchError.message };
+      }
+
+      const searchResults = await response.json();
+      this._logger.log(this, `Searching for phrase: ${searchPhrase} completed.`);
+
+      return { success: true, searchResults };
+    } catch (error) {
+      this._logger.log(this, error);
+      return { success: false, message: error.message };
+    }
+  }
 }
