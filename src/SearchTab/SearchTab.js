@@ -15,7 +15,7 @@ export default class SearchTab extends React.Component {
   }
 
   render () {
-    const searchResults = this.state.searchResults.map((s, index) => <SearchResult key={index} title={s.title} />);
+    const searchResults = this.state.searchResults.map((s, index) => <SearchResult key={index} title={s.title} searchResult={s} />);
 
     return (
       <div className='container pt-4'>
@@ -36,9 +36,9 @@ export default class SearchTab extends React.Component {
         return;
       }
 
-      // TODO mapować jakoś obiekty tracka, albumu i artysy, albo z api zeby przyochdzilo gotowe
-      const searchResults = searchActionResult.searchResults.map(s => ({ title: s.trackTitle || s.albumName || s.artistName }));
-      this.setState({ searchResults });
+      this._logger.log(this, 'Search results found:\n' + JSON.stringify(searchActionResult.searchResults, null, 2));
+
+      this.setState({ searchResults: searchActionResult.searchResults });
     } catch (error) {
       this._logger.log(this, error);
     }

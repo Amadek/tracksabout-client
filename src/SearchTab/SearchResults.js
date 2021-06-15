@@ -5,7 +5,9 @@ export default class SearchResult extends React.Component {
     return (
       <div className='row border-bottom'>
         <div className='col-12 py-3'>
-          <div className='fs-5'>{this.props.title}</div>
+          <div className='fs-5'>{this.props.searchResult.title}</div>
+          {this.props.searchResult.albumName && <span className='text-secondary me-3'>{this.props.searchResult.albumName}</span>}
+          {this.props.searchResult.artistName && <span className='text-secondary'>{this.props.searchResult.artistName}</span>}
         </div>
       </div>
     );

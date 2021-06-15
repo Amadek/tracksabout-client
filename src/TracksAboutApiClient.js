@@ -5,7 +5,7 @@ import assert from 'assert';
 export default class TracksAboutApiClient {
   constructor (logger) {
     assert.ok(logger); this._logger = logger;
-    this._tracksAboutApiUrl = 'http://localhost:4000';
+    this._tracksAboutApiUrl = 'https://localhost:4000';
   }
 
   async parseTrack (file) {
@@ -72,7 +72,7 @@ export default class TracksAboutApiClient {
 
     try {
       const response = await fetch(`${this._tracksAboutApiUrl}/search/${searchPhrase}`, {
-        method: 'POST' // TODO zmienić z POST na GET, nie ma potrzeby korzystać z GET, GET jest bardziej intuicyjny tutaj.
+        method: 'GET'
       });
 
       if (!response.ok) {
