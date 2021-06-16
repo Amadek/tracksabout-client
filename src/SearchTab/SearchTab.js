@@ -15,7 +15,12 @@ export default class SearchTab extends React.Component {
   }
 
   render () {
-    const searchResults = this.state.searchResults.map((s, index) => <SearchResult key={index} title={s.title} searchResult={s} />);
+    const searchResults = this.state.searchResults.map((s, index) =>
+      <SearchResult
+        key={index} title={s.title}
+        searchResult={s}
+        onSearchResultClick={this.props.onSearchResultClick}
+      />);
 
     return (
       <div className='container pt-4'>

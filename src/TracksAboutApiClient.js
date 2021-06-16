@@ -90,4 +90,28 @@ export default class TracksAboutApiClient {
       return { success: false, message: error.message };
     }
   }
+
+  async searchById (guid) {
+    assert.ok(guid);
+
+    try {
+      const response = await fetch(`${this._tracksAboutApiUrl}/search/id/${guid}`, {
+        method: 'GET'
+      });
+
+      if (!response.ok) {
+        const searchError = await response.json();
+        this._logger.log(this, 'Search by Id failed:\n' + JSON.stringify(searchError, null, 2));
+        return { success: false, message: searchError.message };
+      }
+
+      const searchResult = await response.json();
+      this._logger.log(this, `Search by Id: ${guid} completed.`);
+
+      return { success: true, searchResult };
+    } catch (error) {
+      this._logger.log(this, error);
+      return { success: false, message: error.message };
+    }
+  }
 }
