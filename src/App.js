@@ -9,6 +9,7 @@ import SearchTab from './SearchTab/SearchTab';
 import TracksAboutApiClient from './TracksAboutApiClient';
 import AlbumTab from './AlbumTab/AlbumTab';
 import Alert from './Alert';
+import ArtistTab from './ArtistTab/ArtistTab';
 
 export default class App extends React.Component {
   constructor () {
@@ -47,6 +48,9 @@ export default class App extends React.Component {
 
       case NavBarState.album:
         return <AlbumTab tracksAboutApiClient={this._tracksAboutApiClient} album={this.state.searchByIdResult} />;
+
+      case NavBarState.artist:
+        return <ArtistTab tracksAboutApiClient={this._tracksAboutApiClient} artist={this.state.searchByIdResult} onAlbumClick={this.handleSearchResultClick} />;
 
       default:
         throw new Error(`NavBarState not supported: ${navBarState}`);
