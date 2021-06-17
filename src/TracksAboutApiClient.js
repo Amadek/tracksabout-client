@@ -82,7 +82,7 @@ export default class TracksAboutApiClient {
       }
 
       const searchResults = await response.json();
-      this._logger.log(this, `Searching for phrase: ${searchPhrase} completed.`);
+      this._logger.log(this, `Searching for phrase: ${searchPhrase} completed. Found: \n ${JSON.stringify(searchResults, null, 2)}`);
 
       return { success: true, searchResults };
     } catch (error) {
@@ -106,7 +106,7 @@ export default class TracksAboutApiClient {
       }
 
       const obj = await response.json();
-      this._logger.log(this, `Search by Id: ${guid} completed.`);
+      this._logger.log(this, `Search by Id: ${guid} completed. Found: \n` + JSON.stringify(obj, null, 2));
 
       return { success: true, obj };
     } catch (error) {

@@ -41,8 +41,6 @@ export default class SearchTab extends React.Component {
         return;
       }
 
-      this._logger.log(this, 'Search results found:\n' + JSON.stringify(searchActionResult.searchResults, null, 2));
-
       this.setState({ searchResults: searchActionResult.searchResults });
     } catch (error) {
       this._logger.log(this, error);

@@ -65,11 +65,15 @@ export default class App extends React.Component {
   async _handleSearchResultClick (searchResultId) {
     try {
       assert.ok(searchResultId);
-      const searchByIdResult = await this._tracksAboutApiClient.searchById(searchResultId);
+      let searchByIdResult = await this._tracksAboutApiClient.searchById(searchResultId);
       if (!searchByIdResult.success) {
         this._logger.log(this, 'Search by Id failed.');
         this.setState({ searchByIDErrorMessage: searchByIdResult.message });
         return;
+      }
+
+      if (searchByIdResult.obj.type === 'track') {
+        searchByIdResult = await this._tracksAboutApiClient.searchById(searchByIdResult.obj.albumId);
       }
 
       const navBarState = this._getNavBarState(searchByIdResult.obj.type);

@@ -10,8 +10,6 @@ export default class AlbumTab extends React.Component {
   }
 
   render () {
-    this._logger.log(this, JSON.stringify(this.props.album, null, 2));
-
     const tracks = this.props.album.tracks.map((t, index) =>
       <div key={t._id} className='row'>
         <div className='col-10 p-2 border-bottom'>
