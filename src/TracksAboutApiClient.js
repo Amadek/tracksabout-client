@@ -105,10 +105,10 @@ export default class TracksAboutApiClient {
         return { success: false, message: searchError.message };
       }
 
-      const searchResult = await response.json();
+      const obj = await response.json();
       this._logger.log(this, `Search by Id: ${guid} completed.`);
 
-      return { success: true, searchResult };
+      return { success: true, obj };
     } catch (error) {
       this._logger.log(this, error);
       return { success: false, message: error.message };

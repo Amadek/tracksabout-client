@@ -7,6 +7,7 @@ import ProcessTracksButton from './ProcessTracksButton';
 import TracksAboutApiClient from '../TracksAboutApiClient';
 import assert from 'assert';
 import TrackState from './TrackState';
+import Alert from '../Alert';
 
 export default class UploadTrackTab extends React.Component {
   constructor () {
@@ -38,10 +39,7 @@ export default class UploadTrackTab extends React.Component {
 
     return (
       <div className='container'>
-        {this.state.uploadingTracksErrorMessage &&
-          <div className='row'>
-            <div className='alert alert-danger m-0 mt-3'>{this.state.uploadingTracksErrorMessage}</div>
-          </div>}
+        {this.state.uploadingTracksErrorMessage && <Alert message={this.state.uploadingTracksErrorMessage} />}
         <input
           type='file' className='visually-hidden' accept='audio/flac'
           multiple ref={fileInput => { this._fileInput = fileInput; }} onChange={this.handleFilesChange}

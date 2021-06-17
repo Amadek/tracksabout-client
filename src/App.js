@@ -8,6 +8,7 @@ import NavBarState from './Navbar/NavbarState';
 import SearchTab from './SearchTab/SearchTab';
 import TracksAboutApiClient from './TracksAboutApiClient';
 import AlbumTab from './AlbumTab/AlbumTab';
+import Alert from './Alert';
 
 export default class App extends React.Component {
   constructor () {
@@ -19,6 +20,7 @@ export default class App extends React.Component {
 
     this.state = {
       navBarState: NavBarState.home,
+      searchByIDErrorMessage: null,
       searchByIdResult: null
     };
   }
@@ -28,6 +30,7 @@ export default class App extends React.Component {
       <>
         <Navbar onNavItemClick={this.handleNavItemClick} />
         <Breadcrumb />
+        {this.state.searchByIDErrorMessage && <Alert message={this.state.searchByIDErrorMessage} />}
         {this._getTab(this.state.navBarState)}
       </>
     );
@@ -62,18 +65,27 @@ export default class App extends React.Component {
   async _handleSearchResultClick (searchResultId) {
     try {
       assert.ok(searchResultId);
-      this._logger.log(this, 'Search result click ' + searchResultId);
-
-      // TODO ucywilizować ten kod tutaj.
       const searchByIdResult = await this._tracksAboutApiClient.searchById(searchResultId);
+      if (!searchByIdResult.success) {
+        this._logger.log(this, 'Search by Id failed.');
+        this.setState({ searchByIDErrorMessage: searchByIdResult.message });
+        return;
+      }
 
-      this._logger.log(this, searchByIdResult.searchResult);
+      const navBarState = this._getNavBarState(searchByIdResult.obj.type);
 
-      if (searchByIdResult.searchResult.type !== 'album') throw new Error(`Route for ${searchResultId.type} not implemented yet.`);
-
-      this.setState({ navBarState: NavBarState.album, searchByIdResult: searchByIdResult.searchResult });
+      this.setState({ navBarState, searchByIdResult: searchByIdResult.obj });
     } catch (error) {
       this._logger.log(this, error);
+    }
+  }
+
+  _getNavBarState (searchByIdResultType) {
+    switch (searchByIdResultType) {
+      case 'artist': return NavBarState.artist;
+      case 'album': return NavBarState.album;
+      case 'track': return NavBarState.album;
+      default: throw new Error(`NavBarState for ${searchByIdResultType} is not implemented.`);
     }
   }
 }
