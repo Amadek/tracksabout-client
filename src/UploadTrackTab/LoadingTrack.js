@@ -15,6 +15,7 @@ export default class LoadingTrack extends React.Component {
           <div className='fs-5'>{this.props.fileName}</div>
           {this.props.track &&
             <ul className='my-2 text-secondary'>
+              <li>no. {this.props.track.number}</li>
               <li>Title: {this.props.track.title}</li>
               <li>Album: {this.props.track.albumName}</li>
               <li>Artist: {this.props.track.artistName}</li>

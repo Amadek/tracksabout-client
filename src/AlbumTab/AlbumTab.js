@@ -10,10 +10,10 @@ export default class AlbumTab extends React.Component {
   }
 
   render () {
-    const tracks = this.props.album.tracks.map((t, index) =>
-      <div key={t._id} className='row'>
+    const tracks = this.props.album.tracks.map(t =>
+      <div key={t.number} className='row'>
         <div className='col-10 p-2 border-bottom'>
-          {index + 1}. {t.title}
+          {t.number}. {t.title}
         </div>
       </div>
     );
