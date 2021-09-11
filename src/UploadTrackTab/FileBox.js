@@ -11,13 +11,13 @@ export default class FileBox extends React.Component {
   render () {
     return (
       <div className='row'>
-        <div className='col p-0 pt-4 pb-2'>
+        <div className='col'>
           <div
-            className={'border m-0 p-5' + (this.state.fileOverFileBox ? ' border-4' : '')} role='button'
+            className={'border p-5 mt-3' + (this.state.fileOverFileBox ? ' border-4' : '')} role='button'
             onClick={this.props.onFileBoxClick} onDrop={this.props.onDropToFileBox} onDragOver={this.handleDragOverFileBox} onDragLeave={this.handleDragLeaveFileBox}
             // TODO zrobić akcje na zakończeniu dropa pliku.
           >
-            <p className='text-center m-0 fst-italic'>Drag tracks here...</p>
+            <div className='text-center fst-italic'>Drag tracks here...</div>
           </div>
         </div>
       </div>

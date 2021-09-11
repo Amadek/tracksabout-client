@@ -8,7 +8,6 @@ import NavBarState from './Navbar/NavbarState';
 import SearchTab from './SearchTab/SearchTab';
 import TracksAboutApiClient from './TracksAboutApiClient';
 import AlbumTab from './AlbumTab/AlbumTab';
-import Alert from './Alert';
 import ArtistTab from './ArtistTab/ArtistTab';
 
 export default class App extends React.Component {
@@ -17,12 +16,11 @@ export default class App extends React.Component {
     this._logger = new Logger();
     this._tracksAboutApiClient = new TracksAboutApiClient(new Logger());
     this.handleNavItemClick = this._handleNavItemClick.bind(this);
-    this.handleSearchResultClick = this._handleSearchResultClick.bind(this);
+    this.handleEntityLoaded = this._handleEntityLoaded.bind(this);
 
     this.state = {
       navBarState: NavBarState.home,
-      searchByIDErrorMessage: null,
-      searchByIdResult: null
+      loadedEntity: null
     };
   }
 
@@ -31,7 +29,6 @@ export default class App extends React.Component {
       <>
         <Navbar onNavItemClick={this.handleNavItemClick} />
         <Breadcrumb />
-        {this.state.searchByIDErrorMessage && <Alert message={this.state.searchByIDErrorMessage} />}
         {this._getTab(this.state.navBarState)}
       </>
     );
@@ -44,13 +41,13 @@ export default class App extends React.Component {
         return <UploadTrackTab />;
 
       case NavBarState.search:
-        return <SearchTab tracksAboutApiClient={this._tracksAboutApiClient} onSearchResultClick={this.handleSearchResultClick} />;
+        return <SearchTab tracksAboutApiClient={this._tracksAboutApiClient} onSearchResultLoaded={this.handleEntityLoaded} />;
 
       case NavBarState.album:
-        return <AlbumTab tracksAboutApiClient={this._tracksAboutApiClient} album={this.state.searchByIdResult} />;
+        return <AlbumTab tracksAboutApiClient={this._tracksAboutApiClient} album={this.state.loadedEntity} onArtistLoaded={this.handleEntityLoaded} />;
 
       case NavBarState.artist:
-        return <ArtistTab tracksAboutApiClient={this._tracksAboutApiClient} artist={this.state.searchByIdResult} onAlbumClick={this.handleSearchResultClick} />;
+        return <ArtistTab tracksAboutApiClient={this._tracksAboutApiClient} artist={this.state.loadedEntity} onAlbumLoaded={this.handleEntityLoaded} />;
 
       default:
         throw new Error(`NavBarState not supported: ${navBarState}`);
@@ -66,34 +63,26 @@ export default class App extends React.Component {
     }
   }
 
-  async _handleSearchResultClick (searchResultId) {
+  /**
+   * Based on loaded entity (album or artist) routes to specific tab.
+   * @param {*} entity
+   */
+  _handleEntityLoaded (entity) {
     try {
-      assert.ok(searchResultId);
-      let searchByIdResult = await this._tracksAboutApiClient.searchById(searchResultId);
-      if (!searchByIdResult.success) {
-        this._logger.log(this, 'Search by Id failed.');
-        this.setState({ searchByIDErrorMessage: searchByIdResult.message });
-        return;
-      }
-
-      if (searchByIdResult.obj.type === 'track') {
-        searchByIdResult = await this._tracksAboutApiClient.searchById(searchByIdResult.obj.albumId);
-      }
-
-      const navBarState = this._getNavBarState(searchByIdResult.obj.type);
-
-      this.setState({ navBarState, searchByIdResult: searchByIdResult.obj });
+      const navBarState = this._getNavBarState(entity.type);
+      this._logger.log(this, `Route to ${navBarState} tab.`);
+      this.setState({ navBarState, loadedEntity: entity });
     } catch (error) {
       this._logger.log(this, error);
     }
   }
 
-  _getNavBarState (searchByIdResultType) {
-    switch (searchByIdResultType) {
+  _getNavBarState (entityType) {
+    switch (entityType) {
       case 'artist': return NavBarState.artist;
       case 'album': return NavBarState.album;
       case 'track': return NavBarState.album;
-      default: throw new Error(`NavBarState for ${searchByIdResultType} is not implemented.`);
+      default: throw new Error(`NavBarState for ${entityType} is not implemented.`);
     }
   }
 }
