@@ -5,7 +5,7 @@ import assert from 'assert';
 export default class TracksAboutApiClient {
   constructor (logger) {
     assert.ok(logger); this._logger = logger;
-    this._tracksAboutApiUrl = 'http://localhost:4000';
+    this._tracksAboutApiUrl = 'https://localhost:4000';
   }
 
   async parseTrack (file) {
@@ -60,6 +60,55 @@ export default class TracksAboutApiClient {
 
       this._logger.log(this, 'Uploading files completed.');
       return { success: true };
+    } catch (error) {
+      this._logger.log(this, error);
+      return { success: false, message: error.message };
+    }
+  }
+
+  async search (searchPhrase) {
+    assert.ok(searchPhrase);
+    this._logger.log(this, `Searching for phrase: ${searchPhrase} started.`);
+
+    try {
+      const response = await fetch(`${this._tracksAboutApiUrl}/search/${searchPhrase}`, {
+        method: 'GET'
+      });
+
+      if (!response.ok) {
+        const searchError = await response.json();
+        this._logger.log(this, 'Search failed:\n' + JSON.stringify(searchError, null, 2));
+        return { success: false, message: searchError.message };
+      }
+
+      const searchResults = await response.json();
+      this._logger.log(this, `Searching for phrase: ${searchPhrase} completed. Found: \n ${JSON.stringify(searchResults, null, 2)}`);
+
+      return { success: true, searchResults };
+    } catch (error) {
+      this._logger.log(this, error);
+      return { success: false, message: error.message };
+    }
+  }
+
+  async searchById (guid) {
+    assert.ok(guid);
+
+    try {
+      const response = await fetch(`${this._tracksAboutApiUrl}/search/id/${guid}`, {
+        method: 'GET'
+      });
+
+      if (!response.ok) {
+        const searchError = await response.json();
+        this._logger.log(this, 'Search by Id failed:\n' + JSON.stringify(searchError, null, 2));
+        return { success: false, message: searchError.message };
+      }
+
+      const obj = await response.json();
+      this._logger.log(this, `Search by Id: ${guid} completed. Found: \n` + JSON.stringify(obj, null, 2));
+
+      return { success: true, obj };
     } catch (error) {
       this._logger.log(this, error);
       return { success: false, message: error.message };

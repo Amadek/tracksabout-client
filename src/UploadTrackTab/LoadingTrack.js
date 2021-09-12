@@ -10,11 +10,15 @@ export default class LoadingTrack extends React.Component {
 
   render () {
     return (
-      <div className={'row' + (this.props.showBorder ? ' border-top' : '')}>
-        <div className='col-10 p-0 py-3'>
+      <div className='row'>
+        <div className='col-12'>
+          <div className={this.props.showBorder ? 'border-top' : ''} />
+        </div>
+        <div className='col-10 py-3'>
           <div className='fs-5'>{this.props.fileName}</div>
           {this.props.track &&
-            <ul className='my-2 text-secondary'>
+            <ul className='m-0 mt-2 text-secondary'>
+              <li>no. {this.props.track.number}</li>
               <li>Title: {this.props.track.title}</li>
               <li>Album: {this.props.track.albumName}</li>
               <li>Artist: {this.props.track.artistName}</li>
@@ -22,7 +26,7 @@ export default class LoadingTrack extends React.Component {
               <li>Mimetype: {this.props.track.mimetype}</li>
             </ul>}
           {this.props.state === TrackState.error &&
-            <p className='text-danger mt-2'>{this.props.errorMessage}</p>}
+            <div className='text-danger mt-2'>{this.props.errorMessage}</div>}
           {this.props.errorOccured}
         </div>
         <div className='col-2 d-flex align-items-center '>

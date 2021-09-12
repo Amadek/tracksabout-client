@@ -1,3 +1,10 @@
+# Environment variables
+To set in _.env_ file:
+1. HTTPS=true
+1. DEBUG=tracksabout-client:*
+1. SSL_CRT_FILE=../certs/localhost.crt
+   SSL_KEY_FILE=../certs/localhost.key
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
