@@ -1,8 +1,8 @@
 import React from 'react';
 
 export default class FileBox extends React.Component {
-  constructor () {
-    super();
+  constructor (props) {
+    super(props);
     this.handleDragOverFileBox = this._handleDragOverFileBox.bind(this);
     this.handleDragLeaveFileBox = this._handleDragLeaveFileBox.bind(this);
     this.state = { fileOverFileBox: false };

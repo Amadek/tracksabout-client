@@ -29,7 +29,7 @@ export default class ArtistTab extends React.Component {
     );
 
     return (
-      <div className='container-fluid border-top'>
+      <div className='container-fluid'>
         <div className='row'>
           <div className='col-2 p-3 bg-light'>
             <ul className='list-unstyled'>
