@@ -1,10 +1,10 @@
 
 const NavBarState = {
-  home: 'home',
-  upload: 'upload',
-  search: 'search',
-  album: 'album',
-  artist: 'artist'
+  home: 'Home',
+  upload: 'Upload track',
+  search: 'Search',
+  album: 'Album tab',
+  artist: 'Artist tab'
 };
 
 export default NavBarState;

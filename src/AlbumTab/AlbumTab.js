@@ -23,7 +23,7 @@ export default class AlbumTab extends React.Component {
     );
 
     return (
-      <div className='container-fluid border-top'>
+      <div className='container-fluid'>
         <div className='row'>
           <div className='col-2 p-3 bg-light border-end'>
             <ul className='list-unstyled'>

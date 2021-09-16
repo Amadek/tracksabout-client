@@ -1,6 +1,6 @@
 import React from 'react';
 import Navbar from './Navbar/Navbar';
-import Breadcrumb from './Breadcrumb';
+import Breadcrumbs from './Breadcrumb/Breadcrumbs';
 import UploadTrackTab from './UploadTrackTab/UploadTrackTab';
 import Logger from './Logger';
 import assert from 'assert';
@@ -9,17 +9,22 @@ import SearchTab from './SearchTab/SearchTab';
 import TracksAboutApiClient from './TracksAboutApiClient';
 import AlbumTab from './AlbumTab/AlbumTab';
 import ArtistTab from './ArtistTab/ArtistTab';
+import BreadcrumbPathGenerator from './Breadcrumb/BreadcrumbPathGenerator';
+import BreadcrumbEntityData from './Breadcrumb/BreadcrumbEntityData';
+import BreadcrumbNavData from './Breadcrumb/BreadcrumbNavData';
 
 export default class App extends React.Component {
   constructor () {
     super();
     this._logger = new Logger();
     this._tracksAboutApiClient = new TracksAboutApiClient(new Logger());
+    this._breadcrumbPathGenerator = new BreadcrumbPathGenerator();
     this.handleNavItemClick = this._handleNavItemClick.bind(this);
     this.handleEntityLoaded = this._handleEntityLoaded.bind(this);
 
     this.state = {
       navBarState: NavBarState.home,
+      breadcrumbPath: [new BreadcrumbEntityData({ name: NavBarState.home, entityId: null })],
       loadedEntity: null
     };
   }
@@ -28,7 +33,10 @@ export default class App extends React.Component {
     return (
       <>
         <Navbar onNavItemClick={this.handleNavItemClick} />
-        <Breadcrumb />
+        <Breadcrumbs
+          tracksAboutApiClient={this._tracksAboutApiClient} breadcrumbPath={this.state.breadcrumbPath}
+          onBreadcrumbEntityLoaded={this.handleEntityLoaded} onBreadcrumbNavClick={this.handleNavItemClick}
+        />
         {this._getTab(this.state.navBarState)}
       </>
     );
@@ -57,7 +65,12 @@ export default class App extends React.Component {
   _handleNavItemClick (navBarState) {
     try {
       assert.ok(navBarState);
-      this.setState({ navBarState });
+
+      const breadcrumbData = new BreadcrumbNavData(navBarState);
+      this._breadcrumbPathGenerator.clearPath();
+      const breadcrumbPath = this._breadcrumbPathGenerator.addToPath(breadcrumbData);
+
+      this.setState({ navBarState, breadcrumbPath });
     } catch (error) {
       this._logger.log(this, error);
     }
@@ -71,7 +84,11 @@ export default class App extends React.Component {
     try {
       const navBarState = this._getNavBarState(entity.type);
       this._logger.log(this, `Route to ${navBarState} tab.`);
-      this.setState({ navBarState, loadedEntity: entity });
+
+      const breadcrumbData = new BreadcrumbEntityData({ name: entity.name, entityId: entity._id });
+      const breadcrumbPath = this._breadcrumbPathGenerator.addToPath(breadcrumbData);
+
+      this.setState({ navBarState, breadcrumbPath, loadedEntity: entity });
     } catch (error) {
       this._logger.log(this, error);
     }
