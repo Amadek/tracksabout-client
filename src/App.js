@@ -10,6 +10,8 @@ import TracksAboutApiClient from './TracksAboutApiClient';
 import AlbumTab from './AlbumTab/AlbumTab';
 import ArtistTab from './ArtistTab/ArtistTab';
 import BreadcrumbPathGenerator from './Breadcrumb/BreadcrumbPathGenerator';
+import BreadcrumbEntityData from './Breadcrumb/BreadcrumbEntityData';
+import BreadcrumbNavData from './Breadcrumb/BreadcrumbNavData';
 
 export default class App extends React.Component {
   constructor () {
@@ -22,7 +24,7 @@ export default class App extends React.Component {
 
     this.state = {
       navBarState: NavBarState.home,
-      breadcrumbPath: [ NavBarState.home ],
+      breadcrumbPath: [new BreadcrumbEntityData({ name: NavBarState.home, entityId: null })],
       loadedEntity: null
     };
   }
@@ -31,7 +33,10 @@ export default class App extends React.Component {
     return (
       <>
         <Navbar onNavItemClick={this.handleNavItemClick} />
-        <Breadcrumbs breadcrumbPath={this.state.breadcrumbPath} />
+        <Breadcrumbs
+          tracksAboutApiClient={this._tracksAboutApiClient} breadcrumbPath={this.state.breadcrumbPath}
+          onBreadcrumbEntityLoaded={this.handleEntityLoaded} onBreadcrumbNavClick={this.handleNavItemClick}
+        />
         {this._getTab(this.state.navBarState)}
       </>
     );
@@ -61,7 +66,7 @@ export default class App extends React.Component {
     try {
       assert.ok(navBarState);
 
-      const breadcrumbData = { name: navBarState };
+      const breadcrumbData = new BreadcrumbNavData(navBarState);
       this._breadcrumbPathGenerator.clearPath();
       const breadcrumbPath = this._breadcrumbPathGenerator.addToPath(breadcrumbData);
 
@@ -80,7 +85,7 @@ export default class App extends React.Component {
       const navBarState = this._getNavBarState(entity.type);
       this._logger.log(this, `Route to ${navBarState} tab.`);
 
-      const breadcrumbData = { name: entity.name };
+      const breadcrumbData = new BreadcrumbEntityData({ name: entity.name, entityId: entity._id });
       const breadcrumbPath = this._breadcrumbPathGenerator.addToPath(breadcrumbData);
 
       this.setState({ navBarState, breadcrumbPath, loadedEntity: entity });
