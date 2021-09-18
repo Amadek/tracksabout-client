@@ -9,6 +9,7 @@ export default class AlbumTab extends React.Component {
     assert.ok(this.props.tracksAboutApiClient);
     this._logger = new Logger();
 
+    this.audioElement = React.createRef();
     this.handleArtistClick = this._handleArtistClick.bind(this);
     this.state = {
       searchArtistErrorMessage: null
@@ -24,6 +25,7 @@ export default class AlbumTab extends React.Component {
 
     return (
       <div className='container-fluid'>
+        <audio ref={this.audioElement} src={'https://localhost:4000/track/stream/' + this.props.album.tracks[0]._id} crossOrigin='anonymous' />
         <div className='row'>
           <div className='col-2 p-3 bg-light border-end'>
             <ul className='list-unstyled'>
@@ -41,6 +43,13 @@ export default class AlbumTab extends React.Component {
         </div>
       </div>
     );
+  }
+
+  componentDidMount () {
+    const audioContext = new window.AudioContext();
+    const track = audioContext.createMediaElementSource(this.audioElement.current);
+    track.connect(audioContext.destination);
+    this.audioElement.current.play();
   }
 
   async _handleArtistClick () {
