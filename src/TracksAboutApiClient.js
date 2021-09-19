@@ -114,4 +114,9 @@ export default class TracksAboutApiClient {
       return { success: false, message: error.message };
     }
   }
+
+  getStreamTrackUrl (trackId) {
+    assert.ok(trackId);
+    return `${this._tracksAboutApiUrl}/track/stream/${trackId}`;
+  }
 }

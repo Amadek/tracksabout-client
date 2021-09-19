@@ -10,22 +10,50 @@ export default class AlbumTab extends React.Component {
     this._logger = new Logger();
 
     this.audioElement = React.createRef();
+    this.handleTrackClick = this._handleTrackClick.bind(this);
+    this.handleTrackDoubleClick = this._handleTrackDoubleClick.bind(this);
     this.handleArtistClick = this._handleArtistClick.bind(this);
     this.state = {
-      searchArtistErrorMessage: null
+      searchArtistErrorMessage: null,
+      clickedTrackId: null,
+      doubleClickedTrackId: null
     };
   }
 
   render () {
-    const tracks = this.props.album.tracks.map(t =>
-      <div key={t.number} className='p-3 border-bottom'>
-        {t.number}. {t.title}
+    const tracksTable = (
+      <div className='table-responsive'>
+        <table className='table table-striped'>
+          <thead>
+            <tr>
+              <th scope='col'>#</th>
+              <th scope='col'>Title</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.props.album.tracks.map(track =>
+              <tr
+                key={track._id}
+                onClick={() => this.handleTrackClick(track._id)}
+                onDoubleClick={() => this.handleTrackDoubleClick(track._id)}
+                className={this.state.clickedTrackId === track._id && 'table-primary'}
+              >
+                <th scope='row'>{track.number}</th>
+                <td>{track.title}</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     );
 
     return (
       <div className='container-fluid'>
-        <audio ref={this.audioElement} src={'https://localhost:4000/track/stream/' + this.props.album.tracks[0]._id} crossOrigin='anonymous' />
+        <audio
+          ref={this.audioElement}
+          src={this.state.doubleClickedTrackId && this.props.tracksAboutApiClient.getStreamTrackUrl(this.state.doubleClickedTrackId)}
+          crossOrigin='anonymous'
+        />
         <div className='row'>
           <div className='col-2 p-3 bg-light border-end'>
             <ul className='list-unstyled'>
@@ -38,7 +66,7 @@ export default class AlbumTab extends React.Component {
             <div className='mx-3'>
               {this.state.searchArtistErrorMessage && <Alert message={this.state.searchArtistErrorMessage} />}
             </div>
-            {tracks}
+            {tracksTable}
           </div>
         </div>
       </div>
@@ -49,7 +77,27 @@ export default class AlbumTab extends React.Component {
     const audioContext = new window.AudioContext();
     const track = audioContext.createMediaElementSource(this.audioElement.current);
     track.connect(audioContext.destination);
-    this.audioElement.current.play();
+  }
+
+  async _handleTrackClick (trackId) {
+    try {
+      assert.ok(trackId);
+      this.setState({ clickedTrackId: trackId });
+    } catch (error) {
+      this._logger.log(this, error);
+    }
+  }
+
+  async _handleTrackDoubleClick (trackId) {
+    try {
+      assert.ok(trackId);
+
+      this.setState({ doubleClickedTrackId: trackId }, () => {
+        this.audioElement.current.play();
+      });
+    } catch (error) {
+      this._logger.log(this, error);
+    }
   }
 
   async _handleArtistClick () {
