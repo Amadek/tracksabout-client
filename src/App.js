@@ -12,6 +12,7 @@ import ArtistTab from './ArtistTab/ArtistTab';
 import BreadcrumbPathGenerator from './Breadcrumb/BreadcrumbPathGenerator';
 import BreadcrumbEntityData from './Breadcrumb/BreadcrumbEntityData';
 import BreadcrumbNavData from './Breadcrumb/BreadcrumbNavData';
+import PlayBar from './PlayBar';
 
 export default class App extends React.Component {
   constructor () {
@@ -21,11 +22,13 @@ export default class App extends React.Component {
     this._breadcrumbPathGenerator = new BreadcrumbPathGenerator();
     this.handleNavItemClick = this._handleNavItemClick.bind(this);
     this.handleEntityLoaded = this._handleEntityLoaded.bind(this);
+    this.handleTrackDoubleClick = this._handleTrackDoubleClick.bind(this);
 
     this.state = {
       navBarState: NavBarState.home,
       breadcrumbPath: [new BreadcrumbEntityData({ name: NavBarState.home, entityId: null })],
-      loadedEntity: null
+      loadedEntity: null,
+      doubleClickedTrackId: null
     };
   }
 
@@ -38,6 +41,7 @@ export default class App extends React.Component {
           onBreadcrumbEntityLoaded={this.handleEntityLoaded} onBreadcrumbNavClick={this.handleNavItemClick}
         />
         {this._getTab(this.state.navBarState)}
+        {this.state.doubleClickedTrackId && <PlayBar tracksAboutApiClient={this._tracksAboutApiClient} trackToPlayId={this.state.doubleClickedTrackId} />}
       </>
     );
   }
@@ -52,7 +56,7 @@ export default class App extends React.Component {
         return <SearchTab tracksAboutApiClient={this._tracksAboutApiClient} onSearchResultLoaded={this.handleEntityLoaded} />;
 
       case NavBarState.album:
-        return <AlbumTab tracksAboutApiClient={this._tracksAboutApiClient} album={this.state.loadedEntity} onArtistLoaded={this.handleEntityLoaded} />;
+        return <AlbumTab tracksAboutApiClient={this._tracksAboutApiClient} album={this.state.loadedEntity} onArtistLoaded={this.handleEntityLoaded} onTrackDoubleClick={this.handleTrackDoubleClick} />;
 
       case NavBarState.artist:
         return <ArtistTab tracksAboutApiClient={this._tracksAboutApiClient} artist={this.state.loadedEntity} onAlbumLoaded={this.handleEntityLoaded} />;
@@ -100,6 +104,15 @@ export default class App extends React.Component {
       case 'album': return NavBarState.album;
       case 'track': return NavBarState.album;
       default: throw new Error(`NavBarState for ${entityType} is not implemented.`);
+    }
+  }
+
+  _handleTrackDoubleClick (trackId) {
+    try {
+      assert.ok(trackId);
+      this.setState({ doubleClickedTrackId: trackId });
+    } catch (error) {
+      this._logger.log(this, error);
     }
   }
 }
