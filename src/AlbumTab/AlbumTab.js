@@ -26,6 +26,7 @@ export default class AlbumTab extends React.Component {
             <tr>
               <th scope='col'>#</th>
               <th scope='col'>Title</th>
+              <th scope='row'>Duration</th>
             </tr>
           </thead>
           <tbody>
@@ -33,11 +34,12 @@ export default class AlbumTab extends React.Component {
               <tr
                 key={track._id}
                 onClick={() => this.handleTrackClick(track._id)}
-                onDoubleClick={() => this.props.onTrackDoubleClick(track._id)}
+                onDoubleClick={() => this.props.onTrackDoubleClick(track)}
                 className={this.state.clickedTrackId === track._id ? 'table-primary' : ''}
               >
-                <th scope='row'>{track.number}</th>
-                <td>{track.title}</td>
+                <td scope='row'>{track.number}</td>
+                <td scope='row'>{track.title}</td>
+                <td scope='row'>{track.duration} s</td>
               </tr>
             )}
           </tbody>

@@ -28,7 +28,7 @@ export default class App extends React.Component {
       navBarState: NavBarState.home,
       breadcrumbPath: [new BreadcrumbEntityData({ name: NavBarState.home, entityId: null })],
       loadedEntity: null,
-      doubleClickedTrackId: null
+      doubleClickedTrack: null
     };
   }
 
@@ -41,7 +41,7 @@ export default class App extends React.Component {
           onBreadcrumbEntityLoaded={this.handleEntityLoaded} onBreadcrumbNavClick={this.handleNavItemClick}
         />
         {this._getTab(this.state.navBarState)}
-        {this.state.doubleClickedTrackId && <PlayBar tracksAboutApiClient={this._tracksAboutApiClient} trackToPlayId={this.state.doubleClickedTrackId} />}
+        {this.state.doubleClickedTrack && <PlayBar tracksAboutApiClient={this._tracksAboutApiClient} trackToPlay={this.state.doubleClickedTrack} />}
       </>
     );
   }
@@ -107,10 +107,10 @@ export default class App extends React.Component {
     }
   }
 
-  _handleTrackDoubleClick (trackId) {
+  _handleTrackDoubleClick (track) {
     try {
-      assert.ok(trackId);
-      this.setState({ doubleClickedTrackId: trackId });
+      assert.ok(track);
+      this.setState({ doubleClickedTrack: track });
     } catch (error) {
       this._logger.log(this, error);
     }
