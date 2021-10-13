@@ -26,7 +26,7 @@ export default class AlbumTab extends React.Component {
             <tr>
               <th scope='col'>#</th>
               <th scope='col'>Title</th>
-              <th scope='row'>Duration</th>
+              <th scope='col'>Duration</th>
             </tr>
           </thead>
           <tbody>
@@ -34,12 +34,12 @@ export default class AlbumTab extends React.Component {
               <tr
                 key={track._id}
                 onClick={() => this.handleTrackClick(track._id)}
-                onDoubleClick={() => this.props.onTrackDoubleClick(track)}
+                onDoubleClick={() => this.props.onTrackDoubleClick(track, this.props.album.tracks)}
                 className={this.state.clickedTrackId === track._id ? 'table-primary' : ''}
               >
-                <td scope='row'>{track.number}</td>
-                <td scope='row'>{track.title}</td>
-                <td scope='row'>{track.duration} s</td>
+                <td>{track.number}</td>
+                <td>{track.title}</td>
+                <td>{new Date(0, 0, 1, 0, 0, track.duration).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' })}</td>
               </tr>
             )}
           </tbody>
@@ -48,8 +48,8 @@ export default class AlbumTab extends React.Component {
     );
 
     return (
-      <div className='container-fluid'>
-        <div className='row'>
+      <div className='container-fluid' style={{ height: 'calc(100% - 97px)' }}>
+        <div className='row' style={{ height: '100%' }}>
           <div className='col-2 p-3 bg-light border-end'>
             <ul className='list-unstyled'>
               <li className='fs-5'>{this.props.album.name}</li>

@@ -12,7 +12,8 @@ import ArtistTab from './ArtistTab/ArtistTab';
 import BreadcrumbPathGenerator from './Breadcrumb/BreadcrumbPathGenerator';
 import BreadcrumbEntityData from './Breadcrumb/BreadcrumbEntityData';
 import BreadcrumbNavData from './Breadcrumb/BreadcrumbNavData';
-import PlayBar from './PlayBar';
+import PlayBar from './Playing/PlayBar';
+import PlayingQueue from './Playing/PlayingQueue';
 
 export default class App extends React.Component {
   constructor () {
@@ -28,7 +29,7 @@ export default class App extends React.Component {
       navBarState: NavBarState.home,
       breadcrumbPath: [new BreadcrumbEntityData({ name: NavBarState.home, entityId: null })],
       loadedEntity: null,
-      doubleClickedTrack: null
+      playingQueue: null
     };
   }
 
@@ -41,7 +42,7 @@ export default class App extends React.Component {
           onBreadcrumbEntityLoaded={this.handleEntityLoaded} onBreadcrumbNavClick={this.handleNavItemClick}
         />
         {this._getTab(this.state.navBarState)}
-        {this.state.doubleClickedTrack && <PlayBar tracksAboutApiClient={this._tracksAboutApiClient} trackToPlay={this.state.doubleClickedTrack} />}
+        {this.state.playingQueue && <PlayBar tracksAboutApiClient={this._tracksAboutApiClient} playingQueue={this.state.playingQueue} />}
       </>
     );
   }
@@ -107,10 +108,17 @@ export default class App extends React.Component {
     }
   }
 
-  _handleTrackDoubleClick (track) {
+  _handleTrackDoubleClick (track, albumTracks) {
     try {
       assert.ok(track);
-      this.setState({ doubleClickedTrack: track });
+      assert.ok(albumTracks);
+
+      const playingQueue = new PlayingQueue();
+      for (const albumTrack of albumTracks) {
+        playingQueue.addToQueue(albumTrack);
+      }
+
+      this.setState({ playingQueue });
     } catch (error) {
       this._logger.log(this, error);
     }
