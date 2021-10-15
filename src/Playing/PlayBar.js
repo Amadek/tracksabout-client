@@ -9,6 +9,7 @@ export default class PlayBar extends React.Component {
     assert.ok(this.props.tracksAboutApiClient);
     assert.ok(this.props.playingQueue);
     this._logger = new Logger();
+    this.props.playingQueue.onReset = this._handleQueueReset.bind(this);
 
     this.audioElement = React.createRef();
     this.handleTogglePlayButton = this._handleTogglePlayButton.bind(this);
@@ -18,8 +19,7 @@ export default class PlayBar extends React.Component {
     this.state = {
       trackProgress: 0,
       playing: false,
-      playingTrack: this.props.playingQueue.getTrackToPlay(),
-      playingTrackCurrentTime: '00:00'
+      playingTrackCurrentTime: new Date(0, 0, 1, 0, 0, 0).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' })
     };
   }
 
@@ -37,7 +37,7 @@ export default class PlayBar extends React.Component {
 
         <div className='d-flex align-items-center justify-content-between'>
           <div className='w-100 p-3'>
-            <span>{this.state.playingTrack?.title}</span>
+            <span>{this.props.playingQueue.getTrackToPlay().title}</span>
           </div>
           <div className='d-flex align-items-center justify-content-center'>
             <i
@@ -80,7 +80,7 @@ export default class PlayBar extends React.Component {
 
         const playingTrack = this.props.playingQueue.getNextTrackToPlay();
         this._logger.log(this, `Track ${playingTrack.title} is next.`);
-        this.setState({ playing: true, playingTrack }, () => {
+        this.setState({ playing: true }, () => {
           this.audioElement.current.play();
         });
       });
@@ -110,13 +110,13 @@ export default class PlayBar extends React.Component {
 
       if (this.state.playing) {
         this.audioElement.current.pause();
-        this.setState({ playing: false, playingTrack });
+        this.setState({ playing: false });
         this._logger.log(this, `Track ${playingTrack.title} paused.`);
         return;
       }
 
       this.audioElement.current.play();
-      this.setState({ playing: true, playingTrack });
+      this.setState({ playing: true });
       this._logger.log(this, 'Playing track ' + playingTrack.title);
     } catch (error) {
       this._logger.log(this, error);
@@ -129,7 +129,7 @@ export default class PlayBar extends React.Component {
 
       const playingTrack = this.props.playingQueue.getNextTrackToPlay();
       this._logger.log(this, `Track ${playingTrack.title} is next (clicked next button).`);
-      this.setState({ playing: true, playingTrack }, () => {
+      this.setState({ playing: true }, () => {
         this.audioElement.current.play();
       });
     } catch (error) {
@@ -143,9 +143,19 @@ export default class PlayBar extends React.Component {
 
       const playingTrack = this.props.playingQueue.getPreviousTrackToPlay();
       this._logger.log(this, `Track ${playingTrack.title} is next (clicked previous button).`);
-      this.setState({ playing: true, playingTrack }, () => {
+      this.setState({ playing: true }, () => {
         this.audioElement.current.play();
       });
+    } catch (error) {
+      this._logger.log(this, error);
+    }
+  }
+
+  _handleQueueReset () {
+    try {
+      this._logger.log(this, 'Playing queue reset checked.');
+      this.audioElement.current.pause();
+      this.setState({ playing: false });
     } catch (error) {
       this._logger.log(this, error);
     }

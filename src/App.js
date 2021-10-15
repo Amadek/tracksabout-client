@@ -29,7 +29,7 @@ export default class App extends React.Component {
       navBarState: NavBarState.home,
       breadcrumbPath: [new BreadcrumbEntityData({ name: NavBarState.home, entityId: null })],
       loadedEntity: null,
-      playingQueue: null
+      playingQueue: new PlayingQueue()
     };
   }
 
@@ -42,7 +42,7 @@ export default class App extends React.Component {
           onBreadcrumbEntityLoaded={this.handleEntityLoaded} onBreadcrumbNavClick={this.handleNavItemClick}
         />
         {this._getTab(this.state.navBarState)}
-        {this.state.playingQueue && <PlayBar tracksAboutApiClient={this._tracksAboutApiClient} playingQueue={this.state.playingQueue} />}
+        {this.state.playingQueue.getTrackToPlay() && <PlayBar tracksAboutApiClient={this._tracksAboutApiClient} playingQueue={this.state.playingQueue} />}
       </>
     );
   }
@@ -113,12 +113,12 @@ export default class App extends React.Component {
       assert.ok(track);
       assert.ok(albumTracks);
 
-      const playingQueue = new PlayingQueue();
+      this.state.playingQueue.reset();
       for (const albumTrack of albumTracks) {
-        playingQueue.addToQueue(albumTrack);
+        this.state.playingQueue.addToQueue(albumTrack);
       }
 
-      this.setState({ playingQueue });
+      this.setState({ playingQueue: this.state.playingQueue });
     } catch (error) {
       this._logger.log(this, error);
     }

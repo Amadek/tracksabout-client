@@ -8,6 +8,8 @@ export default class PlayingQueue {
     this._queueIndexPosition = 0;
     this._queueStartReached = true;
     this._queueEndReached = true;
+
+    this.onReset = () => {};
   }
 
   addToQueue (track) {
@@ -43,5 +45,14 @@ export default class PlayingQueue {
     if (this._queueIndexPosition === 0) this._queueStartReached = true;
 
     return this._tracksQueue[this._queueIndexPosition];
+  }
+
+  reset () {
+    this._tracksQueue = [];
+    this._queueIndexPosition = 0;
+    this._queueStartReached = true;
+    this._queueEndReached = true;
+
+    this.onReset();
   }
 }
