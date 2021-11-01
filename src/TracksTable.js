@@ -8,10 +8,13 @@ export default class TracksTable extends React.Component {
     assert.ok(props.tracks);
     assert.ok(props.playingTrackId || true);
     assert.ok(props.onTrackClick || true);
+    assert.ok(props.onTrackDoubleClick || true);
     assert.ok(props.onPlaySelectedTracks || true);
     assert.ok(props.onQueueSelectedTracks || true);
     assert.ok(props.onRemoveSelectedTracks || true);
     assert.ok(props.onPlayFromSelectedTrack || true);
+    assert.ok(props.showAlbumColumn || true);
+    assert.ok(props.showArtistColumn || true);
     this._logger = new Logger();
 
     this.handleTrackClick = this._handleTrackClick.bind(this);
@@ -45,8 +48,8 @@ export default class TracksTable extends React.Component {
               </ul>
             </div>}
         </td>
-        <td>{track.albumName}</td>
-        <td>{track.artistName}</td>
+        {this.props.showAlbumColumn && <td>{track.albumName}</td>} 
+        {this.props.showArtistColumn && <td>{track.artistName}</td>}
         <td>{new Date(0, 0, 1, 0, 0, track.duration).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' })}</td>
       </tr>
     );
@@ -59,8 +62,8 @@ export default class TracksTable extends React.Component {
             <th scope='col'>#</th>
             <th scope='col'>Title</th>
             <th scope='col'><i className='bi bi-three-dots-vertical' /></th>
-            <th scope='col'>Album</th>
-            <th scope='col'>Artist</th>
+            {this.props.showAlbumColumn && <th scope='col'>Album</th>}
+            {this.props.showArtistColumn && <th scope='col'>Artist</th>}
             <th scope='col'>Duration</th>
           </tr>
         </thead>

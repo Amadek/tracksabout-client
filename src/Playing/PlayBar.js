@@ -92,6 +92,7 @@ export default class PlayBar extends React.Component {
       // We only force playing in componenent when playing queue hash has changed.
       if (this._playingQueueHash === this.props.playingQueue.hash) return;
 
+      // TODO mamy takiego małego buga, jak sie utwor jeszcze laduje i zacznie sie zmieniac grany utwor to leci DOMException: The play() request was interrupted by a new load request. https://goo.gl/LdLk22
       this.audioElement.current.pause();
       this.audioElement.current.play();
       const playingTrack = this.props.playingQueue.getTrackToPlay();
