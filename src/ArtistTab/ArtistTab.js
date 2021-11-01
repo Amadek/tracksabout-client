@@ -17,28 +17,28 @@ export default class ArtistTab extends React.Component {
 
   render () {
     const albums = this.props.artist.albums.map(a =>
-      <div className='col-3' key={a._id}>
-        <div
-          className='p-3 mt-3 border' role='button'
-          onClick={() => this.handleAlbumClick(a._id)}
-        >
-          {a.name}<br />
-          <span className='text-secondary'>{a.year}</span>
-        </div>
+      <div
+        key={a._id}
+        className='p-3 m-2 border' role='button'
+        onClick={() => this.handleAlbumClick(a._id)}
+      >
+        {a.name}<br />
+        <span className='text-secondary'>{a.year}</span>
       </div>
     );
 
     return (
-      <div className='container-fluid'>
-        <div className='row'>
-          <div className='col-2 p-3 bg-light'>
+      // TODO AP Zrobić jakiegoś providera który będzie mówił jak duże może być body aplikacji.
+      <div className='container-fluid' style={{ height: 'calc(100% - 97px - 76px)', overflowY: 'auto' }}>
+        <div className='row' style={{ height: '100%' }}>
+          <div className='col-2 p-3 bg-light border-end'>
             <ul className='list-unstyled'>
               <li className='fs-5'>{this.props.artist.name}</li>
             </ul>
           </div>
-          <div className='col-10 border-start'>
+          <div className='col-10 p-2'>
             {this.state.searchAlbumErrorMessage && <Alert message={this.state.searchAlbumErrorMessage} />}
-            <div className='row'>
+            <div className='d-flex flex-wrap'>
               {albums}
             </div>
           </div>

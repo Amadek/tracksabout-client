@@ -2,19 +2,27 @@ import React from 'react';
 import assert from 'assert';
 import Logger from '../Logger';
 import Alert from '../Alert';
+import AlbumTrack from './AlbumTrack';
 
 export default class AlbumTab extends React.Component {
   constructor (props) {
     super(props);
     assert.ok(this.props.tracksAboutApiClient);
     assert.ok(this.props.onTrackDoubleClick);
+    assert.ok(this.props.onPlaySelectedTracks);
+    assert.ok(this.props.onQueueSelectedTracks);
+    assert.ok(this.props.album?.tracks);
     this._logger = new Logger();
 
     this.handleTrackClick = this._handleTrackClick.bind(this);
     this.handleArtistClick = this._handleArtistClick.bind(this);
+
     this.state = {
       searchArtistErrorMessage: null,
-      clickedTrackId: null
+      tracks: this.props.album.tracks
+        .sort((trackA, trackB) => trackA.number - trackB.number)
+        .map((track, index) => { const albumTrack = new AlbumTrack(track, index); return albumTrack; }),
+      selectedTracks: []
     };
   }
 
@@ -26,19 +34,33 @@ export default class AlbumTab extends React.Component {
             <tr>
               <th scope='col'>#</th>
               <th scope='col'>Title</th>
+              <th scope='col'><i className='bi bi-three-dots-vertical' /></th>
               <th scope='col'>Duration</th>
             </tr>
           </thead>
           <tbody>
-            {this.props.album.tracks.map(track =>
+            {this.state.tracks.map(track =>
               <tr
                 key={track._id}
-                onClick={() => this.handleTrackClick(track._id)}
-                onDoubleClick={() => this.props.onTrackDoubleClick(track, this.props.album.tracks)}
-                className={this.state.clickedTrackId === track._id ? 'table-primary' : ''}
+                className={this.state.selectedTracks.indexOf(track) !== -1 ? 'table-primary' : ''}
+                style={{ userSelect: 'none' }}
               >
-                <td>{track.number}</td>
-                <td>{track.title}</td>
+                <td>{track.index}</td>
+                <td
+                  onClick={(event) => this.handleTrackClick(event, track)}
+                  onDoubleClick={() => this.props.onTrackDoubleClick(this.props.album.tracks)}
+                >{track.title}
+                </td>
+                <td>
+                  {this.state.selectedTracks.indexOf(track) !== -1 &&
+                    <div className='dropend'>
+                      <i className='bi bi-three-dots-vertical' data-bs-toggle='dropdown' aria-expanded='false' role='button' />
+                      <ul className='dropdown-menu' style={{ borderRadius: 0 }}>
+                        <li><button className='dropdown-item' onClick={() => this.props.onPlaySelectedTracks(this.state.selectedTracks)}>Play</button></li>
+                        <li><button className='dropdown-item' onClick={() => this.props.onQueueSelectedTracks(this.state.selectedTracks)}>Add to queue</button></li>
+                      </ul>
+                    </div>}
+                </td>
                 <td>{new Date(0, 0, 1, 0, 0, track.duration).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' })}</td>
               </tr>
             )}
@@ -56,6 +78,11 @@ export default class AlbumTab extends React.Component {
               <li className='text-secondary' role='button' onClick={this.handleArtistClick}>{this.props.album.artistName}</li>
               <li className='text-secondary'>{this.props.album.year}</li>
             </ul>
+            <button
+              onClick={() => this.props.onTrackDoubleClick(this.props.album.tracks)}
+              type='button' className='btn btn-outline-dark p-1' style={{ width: '100%', borderRadius: 0 }}
+            >Play
+            </button>
           </div>
           <div className='col-10 p-0'>
             <div className='mx-3'>
@@ -68,13 +95,52 @@ export default class AlbumTab extends React.Component {
     );
   }
 
-  async _handleTrackClick (trackId) {
+  async _handleTrackClick (event, clickedTrack) {
     try {
-      assert.ok(trackId);
-      this.setState({ clickedTrackId: trackId });
+      assert.ok(event);
+      assert.ok(clickedTrack);
+
+      if (event.shiftKey) {
+        this.setState({ selectedTracks: this._selectTracksWithShift(clickedTrack, this.state.selectedTracks, this.state.tracks) });
+        return;
+      }
+
+      if (!event.ctrlKey) {
+        this.state.selectedTracks = [];
+      }
+
+      const clickedTrackIndex = this.state.selectedTracks.indexOf(clickedTrack);
+      if (clickedTrackIndex !== -1) this.state.selectedTracks.splice(clickedTrackIndex, 1);
+      else this.state.selectedTracks.push(clickedTrack);
+
+      this.setState({ selectedTracks: this.state.selectedTracks });
     } catch (error) {
       this._logger.log(this, error);
     }
+  }
+
+  /**
+   * @param {AlbumTrack} clickedTrack
+   * @param {AlbumTrack[]} selectedTracks
+   * @param {AlbumTrack[]} tracks
+   */
+  _selectTracksWithShift (clickedTrack, selectedTracks, tracks) {
+    const firstSelectedTrackIndex = selectedTracks[0]?.index ?? 0;
+    const newSelectedTracks = [];
+
+    if (clickedTrack.index > firstSelectedTrackIndex) {
+      for (let trackIndex = firstSelectedTrackIndex; trackIndex <= clickedTrack.index; trackIndex++) {
+        const track = tracks.find(t => t.index === trackIndex);
+        newSelectedTracks.push(track);
+      }
+    } else {
+      for (let trackIndex = firstSelectedTrackIndex; trackIndex >= clickedTrack.index; trackIndex--) {
+        const track = tracks.find(t => t.index === trackIndex);
+        newSelectedTracks.push(track);
+      }
+    }
+
+    return newSelectedTracks;
   }
 
   async _handleArtistClick () {

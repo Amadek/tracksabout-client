@@ -1,6 +1,5 @@
 import React from 'react';
 import Logger from '../Logger';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import LoadingTrack from './LoadingTrack';
 import FileBox from './FileBox';
 import ProcessTracksButton from './ProcessTracksButton';
@@ -38,7 +37,7 @@ export default class UploadTrackTab extends React.Component {
     );
 
     return (
-      <div className='container'>
+      <div className='container' style={{ height: 'calc(100% - 97px - 76px)', overflowY: 'auto' }}>
         {this.state.uploadingTracksErrorMessage && <Alert message={this.state.uploadingTracksErrorMessage} />}
         <input
           type='file' className='visually-hidden' accept='audio/flac'

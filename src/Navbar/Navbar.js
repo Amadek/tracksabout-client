@@ -18,6 +18,7 @@ export default class Navbar extends React.Component {
             <div className='navbar-nav'>
               <span className='nav-link' role='button' onClick={() => this.props.onNavItemClick(NavBarState.search)}>Search</span>
               <span className='nav-link' role='button' onClick={() => this.props.onNavItemClick(NavBarState.upload)}>Upload</span>
+              <span className='nav-link' role='button' onClick={() => this.props.onNavItemClick(NavBarState.queue)}>Queue</span>
             </div>
           </div>
         </div>

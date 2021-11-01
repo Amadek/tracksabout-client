@@ -4,7 +4,8 @@ const NavBarState = {
   upload: 'Upload track',
   search: 'Search',
   album: 'Album tab',
-  artist: 'Artist tab'
+  artist: 'Artist tab',
+  queue: 'Queue tab'
 };
 
 export default NavBarState;

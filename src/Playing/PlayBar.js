@@ -1,14 +1,16 @@
 import React from 'react';
 import assert from 'assert';
 import Logger from '../Logger';
-import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export default class PlayBar extends React.Component {
   constructor (props) {
     super(props);
     assert.ok(this.props.tracksAboutApiClient);
     assert.ok(this.props.playingQueue);
+    assert.ok(this.props.onPlayBarChanged);
+
     this._logger = new Logger();
+    this._playingQueueHash = this.props.playingQueue.hash;
     this.props.playingQueue.onReset = this._handleQueueReset.bind(this);
 
     this.audioElement = React.createRef();
@@ -70,38 +72,98 @@ export default class PlayBar extends React.Component {
 
   componentDidMount () {
     try {
-      this.audioElement.current.addEventListener('ended', () => {
-        this._logger.log(this, `Track ${this.props.playingQueue.getTrackToPlay().title} ended.`);
+      this._audioElementEventListeners = this._createAudioElementEventListeners();
 
-        if (this.props.playingQueue.queueEndReached) {
-          this.setState({ playing: false });
-          return;
-        }
+      for (const eventListenerProperty in this._audioElementEventListeners) {
+        this.audioElement.current.addEventListener(this._audioElementEventListeners[eventListenerProperty].name, this._audioElementEventListeners[eventListenerProperty].listener);
+      }
 
-        const playingTrack = this.props.playingQueue.getNextTrackToPlay();
-        this._logger.log(this, `Track ${playingTrack.title} is next.`);
-        this.setState({ playing: true }, () => {
-          this.audioElement.current.play();
-        });
-      });
-      this.audioElement.current.addEventListener('playing', () => {
-        this.setState({ playing: true });
-      });
-      this.audioElement.current.addEventListener('timeupdate', () => {
-        const playingTrackCurrentTime = new Date(0, 0, 1, 0, 0, this.audioElement.current.currentTime).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' });
-        this.setState({ trackProgress: this.audioElement.current.currentTime * 100.0 / this.props.playingQueue.getTrackToPlay().duration, playingTrackCurrentTime });
-      });
-      this.audioElement.current.addEventListener('waiting', () => {
-        this.setState({ playing: null });
-      });
-      this.audioElement.current.addEventListener('error', () => {
-        this._logger.log(this, 'Track stream error:');
-        this._logger.log(this, this.audioElement.current.error);
-        this.setState({ playing: false });
-      });
+      this.audioElement.current.play();
+      const playingTrack = this.props.playingQueue.getTrackToPlay();
+      this._logger.log(this, 'Playing track on mounting component: ' + playingTrack.title);
+      this.setState({ playing: true });
     } catch (error) {
       this._logger.log(this, error);
     }
+  }
+
+  componentDidUpdate () {
+    try {
+      // We only force playing in componenent when playing queue hash has changed.
+      if (this._playingQueueHash === this.props.playingQueue.hash) return;
+
+      this.audioElement.current.pause();
+      this.audioElement.current.play();
+      const playingTrack = this.props.playingQueue.getTrackToPlay();
+      this._logger.log(this, 'Playing track on updating component: ' + playingTrack.title);
+      this.setState({ playing: true });
+      this._playingQueueHash = this.props.playingQueue.hash;
+    } catch (error) {
+      this._logger.log(this, error);
+    }
+  }
+
+  componentWillUnmount () {
+    try {
+      if (!this._audioElementEventListeners) return;
+
+      for (const eventListenerProperty in this._audioElementEventListeners) {
+        this.audioElement.current.removeEventListener(this._audioElementEventListeners[eventListenerProperty].name, this._audioElementEventListeners[eventListenerProperty].listener);
+      }
+
+      this.audioElement.current.pause();
+      this._logger.log(this, 'Track stopped on unmounting component.');
+    } catch (error) {
+      this._logger.log(this, error);
+    }
+  }
+
+  _createAudioElementEventListeners () {
+    return {
+      ended: {
+        name: 'ended',
+        listener: () => {
+          this._logger.log(this, `Track ${this.props.playingQueue.getTrackToPlay().title} ended.`);
+
+          if (this.props.playingQueue.queueEndReached) {
+            this.setState({ playing: false });
+            return;
+          }
+
+          const playingTrack = this.props.playingQueue.getNextTrackToPlay();
+          this.props.onPlayBarChanged(this.props.playingQueue);
+
+          this._logger.log(this, `Track ${playingTrack.title} is next.`);
+          this.setState({ playing: true }, () => {
+            this.props.onPlayBarChanged(this.props.playingQueue);
+            this.audioElement.current.play();
+          });
+        }
+      },
+      playing: {
+        name: 'playing',
+        listener: () => this.setState({ playing: true })
+      },
+      timeupdate: {
+        name: 'timeupdate',
+        listener: () => {
+          const playingTrackCurrentTime = new Date(0, 0, 1, 0, 0, this.audioElement.current.currentTime).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' });
+          this.setState({ trackProgress: this.audioElement.current.currentTime * 100.0 / this.props.playingQueue.getTrackToPlay().duration, playingTrackCurrentTime });
+        }
+      },
+      waiting: {
+        name: 'waiting',
+        listener: () => this.setState({ playing: null })
+      },
+      error: {
+        name: 'error',
+        listener: () => {
+          this._logger.log(this, 'Track stream error:');
+          this._logger.log(this, this.audioElement.current.error);
+          this.setState({ playing: false });
+        }
+      }
+    };
   }
 
   _handleTogglePlayButton () {
@@ -128,6 +190,8 @@ export default class PlayBar extends React.Component {
       if (this.props.playingQueue.queueEndReached || this.state.playing === null) return;
 
       const playingTrack = this.props.playingQueue.getNextTrackToPlay();
+      this.props.onPlayBarChanged(this.props.playingQueue);
+
       this._logger.log(this, `Track ${playingTrack.title} is next (clicked next button).`);
       this.setState({ playing: true }, () => {
         this.audioElement.current.play();
@@ -142,6 +206,8 @@ export default class PlayBar extends React.Component {
       if (this.props.playingQueue.queueStartReached || this.state.playing === null) return;
 
       const playingTrack = this.props.playingQueue.getPreviousTrackToPlay();
+      this.props.onPlayBarChanged(this.props.playingQueue);
+
       this._logger.log(this, `Track ${playingTrack.title} is next (clicked previous button).`);
       this.setState({ playing: true }, () => {
         this.audioElement.current.play();
@@ -154,8 +220,17 @@ export default class PlayBar extends React.Component {
   _handleQueueReset () {
     try {
       this._logger.log(this, 'Playing queue reset checked.');
+      if (!this.audioElement.current) {
+        this._logger.log(this, 'Audio element is currently null. No action required.');
+        return;
+      }
+
       this.audioElement.current.pause();
-      this.setState({ playing: false });
+      this.setState({ playing: false }, () => {
+        this.audioElement.current.play();
+        this._logger.log(this, 'Playing track from reset queue.');
+        this.setState({ playing: true });
+      });
     } catch (error) {
       this._logger.log(this, error);
     }

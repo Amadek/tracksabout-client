@@ -1,7 +1,10 @@
+import assert from 'assert';
 
 export default class PlayingQueue {
   get queueStartReached () { return this._queueStartReached; }
   get queueEndReached () { return this._queueEndReached; }
+  get queuedTracks () { return this._tracksQueue.slice(); }
+  get hash () { return `${this._queueIndexPosition}_${JSON.stringify(this._tracksQueue.map(t => t._id))}`; }
 
   constructor () {
     this._tracksQueue = [];
@@ -13,8 +16,35 @@ export default class PlayingQueue {
   }
 
   addToQueue (track) {
-    if (this._tracksQueue.length > 0) this._queueEndReached = false;
     this._tracksQueue.push(track);
+    if (this._tracksQueue.length > 1) this._queueEndReached = false;
+  }
+
+  removeFromQueue (trackId) {
+    const trackToRemove = this._tracksQueue.find(t => t._id === trackId);
+    assert.ok(trackToRemove);
+    const trackToRemoveIndex = this._tracksQueue.indexOf(trackToRemove);
+    this._tracksQueue.splice(trackToRemoveIndex, 1);
+
+    if (this._tracksQueue.length === 1) {
+      this._queueStartReached = true;
+      this._queueEndReached = true;
+    }
+
+    // When we remove track after queue position, we have to shift it back.
+    if (trackToRemoveIndex < this._queueIndexPosition) return this.getPreviousTrackToPlay();
+    return this.getTrackToPlay();
+  }
+
+  moveQueue (trackId) {
+    const trackToPlay = this._tracksQueue.find(t => t._id === trackId);
+    assert.ok(trackToPlay);
+
+    this._queueIndexPosition = this._tracksQueue.indexOf(trackToPlay);
+    this._queueStartReached = this._queueIndexPosition === 0;
+    this._queueEndReached = this._queueIndexPosition === this._tracksQueue.length - 1;
+
+    return this.getTrackToPlay();
   }
 
   getTrackToPlay () {
