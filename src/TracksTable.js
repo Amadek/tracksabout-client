@@ -48,7 +48,7 @@ export default class TracksTable extends React.Component {
               </ul>
             </div>}
         </td>
-        {this.props.showAlbumColumn && <td>{track.albumName}</td>} 
+        {this.props.showAlbumColumn && <td>{track.albumName}</td>}
         {this.props.showArtistColumn && <td>{track.artistName}</td>}
         <td>{new Date(0, 0, 1, 0, 0, track.duration).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' })}</td>
       </tr>

@@ -32,8 +32,14 @@ export default class PlayingQueue {
     }
 
     // When we remove track after queue position, we have to shift it back.
-    if (trackToRemoveIndex < this._queueIndexPosition) return this.getPreviousTrackToPlay();
-    return this.getTrackToPlay();
+    const track = trackToRemoveIndex < this._queueIndexPosition
+      ? this.getPreviousTrackToPlay()
+      : this.getTrackToPlay();
+
+    this._queueStartReached = this._queueIndexPosition === 0;
+    this._queueEndReached = this._queueIndexPosition === this._tracksQueue.length - 1;
+
+    return track;
   }
 
   moveQueue (trackId) {

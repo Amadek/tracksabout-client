@@ -26,7 +26,6 @@ export default class AlbumTab extends React.Component {
   }
 
   render () {
-
     return (
       <div className='container-fluid' style={{ height: 'calc(100% - 97px)' }}>
         <div className='row' style={{ height: '100%' }}>

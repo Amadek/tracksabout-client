@@ -78,10 +78,9 @@ export default class PlayBar extends React.Component {
         this.audioElement.current.addEventListener(this._audioElementEventListeners[eventListenerProperty].name, this._audioElementEventListeners[eventListenerProperty].listener);
       }
 
-      this.audioElement.current.play();
       const playingTrack = this.props.playingQueue.getTrackToPlay();
       this._logger.log(this, 'Playing track on mounting component: ' + playingTrack.title);
-      this.setState({ playing: true });
+      this.audioElement.current.play().catch(err => this._logger.log(this, err));
     } catch (error) {
       this._logger.log(this, error);
     }
@@ -92,13 +91,10 @@ export default class PlayBar extends React.Component {
       // We only force playing in componenent when playing queue hash has changed.
       if (this._playingQueueHash === this.props.playingQueue.hash) return;
 
-      // TODO mamy takiego małego buga, jak sie utwor jeszcze laduje i zacznie sie zmieniac grany utwor to leci DOMException: The play() request was interrupted by a new load request. https://goo.gl/LdLk22
-      this.audioElement.current.pause();
-      this.audioElement.current.play();
       const playingTrack = this.props.playingQueue.getTrackToPlay();
       this._logger.log(this, 'Playing track on updating component: ' + playingTrack.title);
-      this.setState({ playing: true });
       this._playingQueueHash = this.props.playingQueue.hash;
+      this.audioElement.current.play().catch(err => this._logger.log(this, err));
     } catch (error) {
       this._logger.log(this, error);
     }
@@ -135,21 +131,25 @@ export default class PlayBar extends React.Component {
           this.props.onPlayBarChanged(this.props.playingQueue);
 
           this._logger.log(this, `Track ${playingTrack.title} is next.`);
-          this.setState({ playing: true }, () => {
-            this.props.onPlayBarChanged(this.props.playingQueue);
-            this.audioElement.current.play();
-          });
+          this.audioElement.current.play().catch(err => this._logger.log(this, err));
         }
       },
       playing: {
         name: 'playing',
         listener: () => this.setState({ playing: true })
       },
+      pause: {
+        name: 'pause',
+        listener: () => this.setState({ playing: false })
+      },
       timeupdate: {
         name: 'timeupdate',
         listener: () => {
           const playingTrackCurrentTime = new Date(0, 0, 1, 0, 0, this.audioElement.current.currentTime).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' });
-          this.setState({ trackProgress: this.audioElement.current.currentTime * 100.0 / this.props.playingQueue.getTrackToPlay().duration, playingTrackCurrentTime });
+          this.setState({
+            trackProgress: this.audioElement.current.currentTime * 100.0 / this.props.playingQueue.getTrackToPlay().duration,
+            playingTrackCurrentTime
+          });
         }
       },
       waiting: {
@@ -172,15 +172,13 @@ export default class PlayBar extends React.Component {
       const playingTrack = this.props.playingQueue.getTrackToPlay();
 
       if (this.state.playing) {
+        this._logger.log(this, `Pausing track ${playingTrack.title}`);
         this.audioElement.current.pause();
-        this.setState({ playing: false });
-        this._logger.log(this, `Track ${playingTrack.title} paused.`);
         return;
       }
 
-      this.audioElement.current.play();
-      this.setState({ playing: true });
       this._logger.log(this, 'Playing track ' + playingTrack.title);
+      this.audioElement.current.play().catch(err => this._logger.log(this, err));
     } catch (error) {
       this._logger.log(this, error);
     }
@@ -194,9 +192,7 @@ export default class PlayBar extends React.Component {
       this.props.onPlayBarChanged(this.props.playingQueue);
 
       this._logger.log(this, `Track ${playingTrack.title} is next (clicked next button).`);
-      this.setState({ playing: true }, () => {
-        this.audioElement.current.play();
-      });
+      this.audioElement.current.play().catch(err => this._logger.log(this, err));
     } catch (error) {
       this._logger.log(this, error);
     }
@@ -210,9 +206,7 @@ export default class PlayBar extends React.Component {
       this.props.onPlayBarChanged(this.props.playingQueue);
 
       this._logger.log(this, `Track ${playingTrack.title} is next (clicked previous button).`);
-      this.setState({ playing: true }, () => {
-        this.audioElement.current.play();
-      });
+      this.audioElement.current.play().catch(err => this._logger.log(this, err));
     } catch (error) {
       this._logger.log(this, error);
     }
@@ -226,12 +220,8 @@ export default class PlayBar extends React.Component {
         return;
       }
 
-      this.audioElement.current.pause();
-      this.setState({ playing: false }, () => {
-        this.audioElement.current.play();
-        this._logger.log(this, 'Playing track from reset queue.');
-        this.setState({ playing: true });
-      });
+      this._logger.log(this, 'Playing track from reset queue.');
+      this.audioElement.current.play().catch(err => this._logger.log(this, err));
     } catch (error) {
       this._logger.log(this, error);
     }
