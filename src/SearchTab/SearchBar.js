@@ -27,7 +27,7 @@ export default class SearchBar extends React.Component {
 
   render () {
     return (
-      <form className='mt-3'>
+      <form>
         <input className='form-control' value={this.state.searchPhrase} onChange={this.handleChange} />
       </form>
     );

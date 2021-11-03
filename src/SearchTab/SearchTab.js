@@ -4,11 +4,13 @@ import SearchBar from './SearchBar';
 import assert from 'assert';
 import SearchResult from './SearchResults';
 import Alert from '../Alert';
+import ContainerHeightProvider from '../ContainerHeightProvider';
 
 export default class SearchTab extends React.Component {
   constructor (props) {
     super(props);
     assert.ok(this.props.tracksAboutApiClient);
+    assert.ok(props.containerHeightProvider instanceof ContainerHeightProvider);
     this._logger = new Logger();
     this.handleSearchStarted = this._handleSearchStarted.bind(this);
     this.handleSearchResultClick = this._handleSearchResultClick.bind(this);
@@ -28,7 +30,7 @@ export default class SearchTab extends React.Component {
       />);
 
     return (
-      <div className='container'>
+      <div className='container pt-3' style={{ ...this.props.containerHeightProvider.provideStyles(), overflowY: 'auto' }}>
         {this.state.searchErrorMessage && <Alert message={this.state.searchErrorMessage} />}
         <SearchBar onSearchStarted={this.handleSearchStarted} />
         {searchResults}

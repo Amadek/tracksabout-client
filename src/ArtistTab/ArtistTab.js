@@ -2,11 +2,14 @@ import React from 'react';
 import assert from 'assert';
 import Logger from '../Logger';
 import Alert from '../Alert';
+import ContainerHeightProvider from '../ContainerHeightProvider';
+import TracksAboutApiClient from '../TracksAboutApiClient';
 
 export default class ArtistTab extends React.Component {
   constructor (props) {
     super(props);
-    assert.ok(this.props.tracksAboutApiClient);
+    assert.ok(props.tracksAboutApiClient instanceof TracksAboutApiClient);
+    assert.ok(props.containerHeightProvider instanceof ContainerHeightProvider);
     this._logger = new Logger();
 
     this.handleAlbumClick = this._handleAlbumClick.bind(this);
@@ -28,15 +31,14 @@ export default class ArtistTab extends React.Component {
     );
 
     return (
-      // TODO AP Zrobić jakiegoś providera który będzie mówił jak duże może być body aplikacji.
-      <div className='container-fluid' style={{ height: 'calc(100% - 97px - 76px)', overflowY: 'auto' }}>
+      <div className='container-fluid' style={{ ...this.props.containerHeightProvider.provideStyles() }}>
         <div className='row' style={{ height: '100%' }}>
           <div className='col-2 p-3 bg-light border-end'>
             <ul className='list-unstyled'>
               <li className='fs-5'>{this.props.artist.name}</li>
             </ul>
           </div>
-          <div className='col-10 p-2'>
+          <div className='col-10 p-2' style={{ height: '100%', overflowY: 'auto' }}>
             {this.state.searchAlbumErrorMessage && <Alert message={this.state.searchAlbumErrorMessage} />}
             <div className='d-flex flex-wrap'>
               {albums}

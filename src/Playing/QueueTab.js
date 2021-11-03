@@ -2,11 +2,14 @@ import React from 'react';
 import assert from 'assert';
 import TracksTable from '../TracksTable';
 import Logger from '../Logger';
+import PlayingQueue from './PlayingQueue';
+import ContainerHeightProvider from '../ContainerHeightProvider';
 
 export default class QueueTab extends React.Component {
   constructor (props) {
     super(props);
-    assert.ok(props.playingQueue);
+    assert.ok(props.playingQueue instanceof PlayingQueue);
+    assert.ok(props.containerHeightProvider instanceof ContainerHeightProvider);
     assert.ok(props.onRemoveSelectedTracks);
     assert.ok(props.onPlayFromSelectedTrack);
     this._logger = new Logger();
@@ -18,7 +21,7 @@ export default class QueueTab extends React.Component {
 
   render () {
     return (
-      <div className='container-fluid' style={{ height: 'calc(100% - 51px - 46px - 76px)' }}>
+      <div className='container-fluid' style={{ ...this.props.containerHeightProvider.provideStyles() }}>
         <div className='row' style={{ height: '100%' }}>
           <div className='col-2 p-3 bg-light border-end'>
             <ul className='list-unstyled'>

@@ -14,7 +14,8 @@ import BreadcrumbEntityData from './Breadcrumb/BreadcrumbEntityData';
 import BreadcrumbNavData from './Breadcrumb/BreadcrumbNavData';
 import PlayBar from './Playing/PlayBar';
 import PlayingQueue from './Playing/PlayingQueue';
-import QueueTab from './QueueTab/QueueTab';
+import QueueTab from './Playing/QueueTab';
+import ContainerHeightProvider from './ContainerHeightProvider';
 
 export default class App extends React.Component {
   constructor () {
@@ -35,7 +36,8 @@ export default class App extends React.Component {
       navBarState: NavBarState.home,
       breadcrumbPath: [new BreadcrumbEntityData({ name: NavBarState.home, entityId: null })],
       loadedEntity: null,
-      playingQueue: new PlayingQueue()
+      playingQueue: new PlayingQueue(),
+      containerHeightProvider: new ContainerHeightProvider(this._handleContainerHeightChanged.bind(this))
     };
 
     this._breadcrumbPathGenerator.addToPath(new BreadcrumbNavData(this.state.navBarState));
@@ -50,7 +52,13 @@ export default class App extends React.Component {
           onBreadcrumbEntityLoaded={this.handleEntityLoaded} onBreadcrumbNavClick={this.handleNavItemClick}
         />
         {this._getTab(this.state.navBarState)}
-        {this.state.playingQueue.getTrackToPlay() && <PlayBar tracksAboutApiClient={this._tracksAboutApiClient} playingQueue={this.state.playingQueue} onPlayBarChanged={this.handlePlayBarChanged} />}
+        {this.state.playingQueue.getTrackToPlay() &&
+          <PlayBar
+            tracksAboutApiClient={this._tracksAboutApiClient}
+            containerHeightProvider={this.state.containerHeightProvider}
+            playingQueue={this.state.playingQueue}
+            onPlayBarChanged={this.handlePlayBarChanged}
+          />}
       </>
     );
   }
@@ -59,19 +67,49 @@ export default class App extends React.Component {
     switch (navBarState) {
       case NavBarState.home:
       case NavBarState.upload:
-        return <UploadTrackTab />;
+        return <UploadTrackTab tracksAboutApiClient={this._tracksAboutApiClient} containerHeightProvider={this.state.containerHeightProvider} />;
 
       case NavBarState.search:
-        return <SearchTab tracksAboutApiClient={this._tracksAboutApiClient} onSearchResultLoaded={this.handleEntityLoaded} />;
+        return (
+          <SearchTab
+            tracksAboutApiClient={this._tracksAboutApiClient}
+            containerHeightProvider={this.state.containerHeightProvider}
+            onSearchResultLoaded={this.handleEntityLoaded}
+          />
+        );
 
       case NavBarState.album:
-        return <AlbumTab tracksAboutApiClient={this._tracksAboutApiClient} album={this.state.loadedEntity} onArtistLoaded={this.handleEntityLoaded} onTrackDoubleClick={this.handleTrackDoubleClick} onPlaySelectedTracks={this.handlePlaySelectedTracks} onQueueSelectedTracks={this.handleQueueSelectedTracks} />;
+        return (
+          <AlbumTab
+            tracksAboutApiClient={this._tracksAboutApiClient}
+            containerHeightProvider={this.state.containerHeightProvider}
+            album={this.state.loadedEntity}
+            onArtistLoaded={this.handleEntityLoaded}
+            onTrackDoubleClick={this.handleTrackDoubleClick}
+            onPlaySelectedTracks={this.handlePlaySelectedTracks}
+            onQueueSelectedTracks={this.handleQueueSelectedTracks}
+          />
+        );
 
       case NavBarState.artist:
-        return <ArtistTab tracksAboutApiClient={this._tracksAboutApiClient} artist={this.state.loadedEntity} onAlbumLoaded={this.handleEntityLoaded} />;
+        return (
+          <ArtistTab
+            tracksAboutApiClient={this._tracksAboutApiClient}
+            containerHeightProvider={this.state.containerHeightProvider}
+            artist={this.state.loadedEntity}
+            onAlbumLoaded={this.handleEntityLoaded}
+          />
+        );
 
       case NavBarState.queue:
-        return <QueueTab playingQueue={this.state.playingQueue} onRemoveSelectedTracks={this.handleRemoveSelectedTracks} onPlayFromSelectedTrack={this.handlePlayFromSelectedTrack} />;
+        return (
+          <QueueTab
+            playingQueue={this.state.playingQueue}
+            containerHeightProvider={this.state.containerHeightProvider}
+            onRemoveSelectedTracks={this.handleRemoveSelectedTracks}
+            onPlayFromSelectedTrack={this.handlePlayFromSelectedTrack}
+          />
+        );
 
       default:
         throw new Error(`NavBarState not supported: ${navBarState}`);
@@ -192,6 +230,15 @@ export default class App extends React.Component {
       assert.ok(playingQueue);
       // We only need to refresh.
       this.setState({ playingQueue: this.state.playingQueue });
+    } catch (error) {
+      this._logger.log(this, error);
+    }
+  }
+
+  _handleContainerHeightChanged () {
+    try {
+      // We only need to refresh.
+      this.setState({ containerHeightProvider: this.state.containerHeightProvider });
     } catch (error) {
       this._logger.log(this, error);
     }

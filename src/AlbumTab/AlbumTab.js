@@ -3,15 +3,18 @@ import assert from 'assert';
 import Logger from '../Logger';
 import Alert from '../Alert';
 import TracksTable from '../TracksTable';
+import ContainerHeightProvider from '../ContainerHeightProvider';
+import TracksAboutApiClient from '../TracksAboutApiClient';
 
 export default class AlbumTab extends React.Component {
   constructor (props) {
     super(props);
-    assert.ok(this.props.tracksAboutApiClient);
-    assert.ok(this.props.onTrackDoubleClick);
-    assert.ok(this.props.onPlaySelectedTracks);
-    assert.ok(this.props.onQueueSelectedTracks);
-    assert.ok(this.props.album?.tracks);
+    assert.ok(props.containerHeightProvider instanceof ContainerHeightProvider);
+    assert.ok(props.tracksAboutApiClient instanceof TracksAboutApiClient);
+    assert.ok(props.onTrackDoubleClick);
+    assert.ok(props.onPlaySelectedTracks);
+    assert.ok(props.onQueueSelectedTracks);
+    assert.ok(props.album?.tracks);
     this._logger = new Logger();
 
     this.handleArtistClick = this._handleArtistClick.bind(this);
@@ -27,7 +30,7 @@ export default class AlbumTab extends React.Component {
 
   render () {
     return (
-      <div className='container-fluid' style={{ height: 'calc(100% - 97px)' }}>
+      <div className='container-fluid' style={{ ...this.props.containerHeightProvider.provideStyles() }}>
         <div className='row' style={{ height: '100%' }}>
           <div className='col-2 p-3 bg-light border-end'>
             <ul className='list-unstyled'>
@@ -41,7 +44,7 @@ export default class AlbumTab extends React.Component {
             >Play
             </button>
           </div>
-          <div className='col-10 p-0'>
+          <div className='col-10 p-0' style={{ height: '100%', overflowY: 'auto' }}>
             <div className='mx-3'>
               {this.state.searchArtistErrorMessage && <Alert message={this.state.searchArtistErrorMessage} />}
             </div>

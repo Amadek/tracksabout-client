@@ -1,13 +1,16 @@
 import React from 'react';
 import assert from 'assert';
 import Logger from '../Logger';
+import ContainerHeightProvider from '../ContainerHeightProvider';
+import TracksAboutApiClient from '../TracksAboutApiClient';
 
 export default class PlayBar extends React.Component {
   constructor (props) {
     super(props);
-    assert.ok(this.props.tracksAboutApiClient);
-    assert.ok(this.props.playingQueue);
-    assert.ok(this.props.onPlayBarChanged);
+    assert.ok(props.tracksAboutApiClient instanceof TracksAboutApiClient);
+    assert.ok(props.containerHeightProvider instanceof ContainerHeightProvider);
+    assert.ok(props.playingQueue);
+    assert.ok(props.onPlayBarChanged);
 
     this._logger = new Logger();
     this._playingQueueHash = this.props.playingQueue.hash;
@@ -27,7 +30,7 @@ export default class PlayBar extends React.Component {
 
   render () {
     return (
-      <div className='container-fluid position-fixed bottom-0 p-0 bg-light'>
+      <div className='container-fluid bottom-0 p-0 bg-light'>
         <audio
           ref={this.audioElement}
           src={this.props.tracksAboutApiClient.getStreamTrackUrl(this.props.playingQueue.getTrackToPlay()._id)}
@@ -72,6 +75,8 @@ export default class PlayBar extends React.Component {
 
   componentDidMount () {
     try {
+      this.props.containerHeightProvider.addPlayBarHeight();
+
       this._audioElementEventListeners = this._createAudioElementEventListeners();
 
       for (const eventListenerProperty in this._audioElementEventListeners) {
@@ -102,6 +107,8 @@ export default class PlayBar extends React.Component {
 
   componentWillUnmount () {
     try {
+      this.props.containerHeightProvider.removePlayBarHeight();
+
       if (!this._audioElementEventListeners) return;
 
       for (const eventListenerProperty in this._audioElementEventListeners) {
