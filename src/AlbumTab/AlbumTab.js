@@ -5,6 +5,7 @@ import Alert from '../Alert';
 import TracksTable from '../TracksTable';
 import ContainerHeightProvider from '../ContainerHeightProvider';
 import TracksAboutApiClient from '../TracksAboutApiClient';
+import './AlbumTab.css';
 
 export default class AlbumTab extends React.Component {
   constructor (props) {
@@ -17,6 +18,7 @@ export default class AlbumTab extends React.Component {
     assert.ok(props.album?.tracks);
     this._logger = new Logger();
 
+    this.albumImg = React.createRef();
     this.handleArtistClick = this._handleArtistClick.bind(this);
     this.handlePlaySelectedTracks = this._handlePlaySelectedTracks.bind(this);
     this.handleQueueSelectedTracks = this._handleQueueSelectedTracks.bind(this);
@@ -43,6 +45,7 @@ export default class AlbumTab extends React.Component {
               type='button' className='btn btn-outline-dark p-1' style={{ width: '100%', borderRadius: 0 }}
             >Play
             </button>
+            <img ref={this.albumImg} alt={this.props.album.name + 'album cover image'} className='mt-3' style={{ width: '100%' }} />
           </div>
           <div className='col-10 p-0' style={{ height: '100%', overflowY: 'auto' }}>
             <div className='mx-3'>
@@ -58,6 +61,19 @@ export default class AlbumTab extends React.Component {
         </div>
       </div>
     );
+  }
+
+  async componentDidMount () {
+    try {
+      const trackId = this.state.tracks[0]._id;
+      const getTrackCoverResult = await this.props.tracksAboutApiClient.getTrackCover(trackId);
+      if (!getTrackCoverResult.success) return;
+
+      const imgData = `data:${getTrackCoverResult.trackCover.format};base64,${getTrackCoverResult.trackCover.data}`;
+      this.albumImg.current.src = imgData;
+    } catch (error) {
+      this._logger.log(this, error);
+    }
   }
 
   _handlePlaySelectedTracks (selectedTrackIds) {
