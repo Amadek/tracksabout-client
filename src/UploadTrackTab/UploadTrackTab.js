@@ -1,6 +1,5 @@
 import React from 'react';
 import Logger from '../Logger';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import LoadingTrack from './LoadingTrack';
 import FileBox from './FileBox';
 import ProcessTracksButton from './ProcessTracksButton';
@@ -8,12 +7,14 @@ import TracksAboutApiClient from '../TracksAboutApiClient';
 import assert from 'assert';
 import TrackState from './TrackState';
 import Alert from '../Alert';
+import ContainerHeightProvider from '../ContainerHeightProvider';
 
 export default class UploadTrackTab extends React.Component {
-  constructor () {
-    super();
+  constructor (props) {
+    super(props);
+    assert.ok(props.tracksAboutApiClient instanceof TracksAboutApiClient);
+    assert.ok(props.containerHeightProvider instanceof ContainerHeightProvider);
     this._logger = new Logger();
-    this._tracksAboutApiClient = new TracksAboutApiClient(new Logger());
     this.handleDropToFileBox = this._handleDropToFileBox.bind(this);
     this.handleFilesChange = this._handleFilesChange.bind(this);
     this.handleUploadButtonClick = this._handleUploadButtonClick.bind(this);
@@ -38,7 +39,7 @@ export default class UploadTrackTab extends React.Component {
     );
 
     return (
-      <div className='container'>
+      <div className='container' style={{ ...this.props.containerHeightProvider.provideStyles(), overflowY: 'auto' }}>
         {this.state.uploadingTracksErrorMessage && <Alert message={this.state.uploadingTracksErrorMessage} />}
         <input
           type='file' className='visually-hidden' accept='audio/flac'
@@ -88,7 +89,7 @@ export default class UploadTrackTab extends React.Component {
 
       let uploadTracksButtonState = TrackState.parsed;
       for (const file of files) {
-        const parseTrackResult = await this._tracksAboutApiClient.parseTrack(file);
+        const parseTrackResult = await this.props.tracksAboutApiClient.parseTrack(file);
 
         if (!parseTrackResult.success) {
           file.state = TrackState.error;
@@ -120,7 +121,7 @@ export default class UploadTrackTab extends React.Component {
 
       if (this.state.files.length === 0) throw new Error('No files selected.');
 
-      const uploadTracksResult = await this._tracksAboutApiClient.uploadTracks(this.state.files);
+      const uploadTracksResult = await this.props.tracksAboutApiClient.uploadTracks(this.state.files);
       if (!uploadTracksResult.success) {
         this.setState({ uploadTracksButtonState: TrackState.error, uploadingTracksErrorMessage: uploadTracksResult.message });
         this._logger.log(this, 'Files upload fail.');

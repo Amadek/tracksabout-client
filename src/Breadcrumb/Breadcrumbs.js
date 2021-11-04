@@ -34,7 +34,7 @@ export default class Breadcrumbs extends React.Component {
 
   _generateBreadcrumbs () {
     // Add all breadcrumbs without last. Safe for empty array.
-    let breadcrumbs = this.props.breadcrumbPath.slice(0, -1).map((breadcrumb, index) => 
+    let breadcrumbs = this.props.breadcrumbPath.slice(0, -1).map((breadcrumb, index) =>
       <li
         className='breadcrumb-item text-primary'
         key={index}
@@ -52,7 +52,7 @@ export default class Breadcrumbs extends React.Component {
         {breadcrumb.name}
       </li>
     ));
-    
+
     return breadcrumbs.length ? breadcrumbs : <span>&nbsp;</span>; // If empty return white symbol for proper div height.
   }
 
@@ -68,10 +68,7 @@ export default class Breadcrumbs extends React.Component {
         return;
       }
 
-      if (!(breadcrumbData instanceof BreadcrumbEntityData))
-      {
-        return;
-      }
+      if (!(breadcrumbData instanceof BreadcrumbEntityData)) return;
 
       let searchByIdResult = await this.props.tracksAboutApiClient.searchById(breadcrumbData.entityId);
       if (!searchByIdResult.success) {
