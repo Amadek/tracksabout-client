@@ -99,6 +99,7 @@ export default class App extends React.Component {
           <ArtistTab
             tracksAboutApiClient={this._tracksAboutApiClient}
             containerHeightProvider={this.state.containerHeightProvider}
+            albumImagesCache={this._albumImagesCache}
             artist={this.state.loadedEntity}
             onAlbumLoaded={this.handleEntityLoaded}
           />

@@ -4,12 +4,15 @@ import Logger from '../Logger';
 import Alert from '../Alert';
 import ContainerHeightProvider from '../ContainerHeightProvider';
 import TracksAboutApiClient from '../TracksAboutApiClient';
+import AlbumCoverImage from '../AlbumCoverImage';
+import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
 
 export default class ArtistTab extends React.Component {
   constructor (props) {
     super(props);
     assert.ok(props.tracksAboutApiClient instanceof TracksAboutApiClient);
     assert.ok(props.containerHeightProvider instanceof ContainerHeightProvider);
+    assert.ok(props.albumImagesCache instanceof AlbumImagesCache);
     this._logger = new Logger();
 
     this.handleAlbumClick = this._handleAlbumClick.bind(this);
@@ -19,29 +22,30 @@ export default class ArtistTab extends React.Component {
   }
 
   render () {
-    const albums = this.props.artist.albums.map(a =>
+    const albums = this.props.artist.albums.map(album =>
       <div
-        key={a._id}
-        className='p-3 m-2 border' role='button'
-        onClick={() => this.handleAlbumClick(a._id)}
+        key={album._id}
+        className='m-2' role='button' style={{ width: '16rem' }}
+        onClick={() => this.handleAlbumClick(album._id)}
       >
-        {a.name}<br />
-        <span className='text-secondary'>{a.year}</span>
+        {/* TODO pokazywać to na hover {album.name}<br />
+        <span className='text-secondary'>{album.year}</span> */}
+        <AlbumCoverImage albumId={album._id} albumImagesCache={this.props.albumImagesCache} />
       </div>
     );
 
     return (
       <div className='container-fluid' style={{ ...this.props.containerHeightProvider.provideStyles() }}>
-        <div className='row' style={{ height: '100%' }}>
-          <div className='col-2 p-3 bg-light border-end'>
-            <ul className='list-unstyled'>
-              <li className='fs-5'>{this.props.artist.name}</li>
-            </ul>
-          </div>
-          <div className='col-10 p-2' style={{ height: '100%', overflowY: 'auto' }}>
-            {this.state.searchAlbumErrorMessage && <Alert message={this.state.searchAlbumErrorMessage} />}
-            <div className='d-flex flex-wrap'>
-              {albums}
+        <div className='row' style={{ height: '100%', overflowY: 'auto' }}>
+          <div className='col p-0'>
+            <div className='p-3 bg-light border-bottom fs-5'>
+              {this.props.artist.name}
+            </div>
+            <div className='p-2'>
+              {this.state.searchAlbumErrorMessage && <Alert message={this.state.searchAlbumErrorMessage} />}
+              <div className='d-flex flex-wrap'>
+                {albums}
+              </div>
             </div>
           </div>
         </div>

@@ -11,13 +11,13 @@ export default class AlbumImagesCache {
     this._albumImages = {};
   }
 
-  async getAlbumCover (trackId, albumId) {
-    assert.ok(trackId);
+  async getAlbumCover (albumId) {
     assert.ok(albumId);
 
     if (this._albumImages[albumId]) return this._albumImages[albumId];
 
-    const getTrackCoverResult = await this._tracksAboutApiClient.getTrackCover(trackId);
+    const getTrackCoverResult = await this._tracksAboutApiClient.getAlbumCover(albumId);
+
     if (!getTrackCoverResult.success) throw new Error(getTrackCoverResult.message);
 
     this._albumImages[albumId] = getTrackCoverResult.trackCover;

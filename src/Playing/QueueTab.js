@@ -29,11 +29,12 @@ export default class QueueTab extends React.Component {
           <div className='col-2 p-3 bg-light border-end' style={{ height: '100%', overflowY: 'auto' }}>
             <ul className='list-unstyled'>
               <li className='fs-5'>{this.state.clickedTrack?.albumName}</li>
-              <li><i>{this.state.clickedTrack?.artistName}</i></li>
-              <li>{this.state.clickedTrack?.title}</li>
+              <li className='text-secondary'>{this.state.clickedTrack?.artistName}</li>
+              <li className='text-secondary'>{this.state.clickedTrack?.year}</li>
+              <li><i>{this.state.clickedTrack?.title}</i></li>
               <li>{this.state.clickedTrack && new Date(0, 0, 1, 0, 0, this.state.clickedTrack.duration).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' })}</li>
             </ul>
-            {this.state.clickedTrack && <AlbumCoverImage trackId={this.state.clickedTrack._id} albumId={this.state.clickedTrack.albumId} albumImagesCache={this.props.albumImagesCache} />}
+            {this.state.clickedTrack && <AlbumCoverImage albumId={this.state.clickedTrack.albumId} albumImagesCache={this.props.albumImagesCache} />}
           </div>
           <div className='col-10 p-0' style={{ height: '100%', overflowY: 'auto' }}>
             <TracksTable

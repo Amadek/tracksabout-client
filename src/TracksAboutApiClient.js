@@ -37,24 +37,24 @@ export default class TracksAboutApiClient {
     }
   }
 
-  async getTrackCover (trackId) {
-    assert.ok(trackId);
-    this._logger.log(this, 'Getting track cover for track id: ' + trackId);
+  async getAlbumCover (albumId) {
+    assert.ok(albumId);
+    this._logger.log(this, 'Getting cover for album id: ' + albumId);
 
     try {
-      const response = await fetch(`${this._tracksAboutApiUrl}/track/cover/${trackId}`, {
+      const response = await fetch(`${this._tracksAboutApiUrl}/track/cover/${albumId}`, {
         method: 'GET'
       });
 
       if (!response.ok) {
-        const getTrackCoverError = await response.json();
-        this._logger.log(this, 'Getting track cover failed:\n' + JSON.stringify(getTrackCoverError, null, 2));
-        return { success: false, message: getTrackCoverError.message };
+        const getAlbumCoverError = await response.json();
+        this._logger.log(this, 'Getting album cover by album failed:\n' + JSON.stringify(getAlbumCoverError, null, 2));
+        return { success: false, message: getAlbumCoverError.message };
       }
 
       const trackCover = await response.json();
 
-      this._logger.log(this, 'Track cover found for track id:' + trackId);
+      this._logger.log(this, 'Album cover found for album id:' + albumId);
       return { success: true, trackCover };
     } catch (error) {
       this._logger.log(this, error);

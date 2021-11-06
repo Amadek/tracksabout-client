@@ -48,7 +48,9 @@ export default class AlbumTab extends React.Component {
               type='button' className='btn btn-outline-dark p-1' style={{ width: '100%', borderRadius: 0 }}
             >Play
             </button>
-            <AlbumCoverImage trackId={this.state.tracks[0]._id} albumId={this.props.album._id} albumImagesCache={this.props.albumImagesCache} />
+            <div className='mt-3'>
+              <AlbumCoverImage albumId={this.props.album._id} albumImagesCache={this.props.albumImagesCache} />
+            </div>
           </div>
           <div className='col-10 p-0' style={{ height: '100%', overflowY: 'auto' }}>
             <div className='mx-3'>
@@ -73,10 +75,6 @@ export default class AlbumTab extends React.Component {
         ? this.state.tracks
         : this.state.tracks.filter(track => selectedTrackIds.some(trackId => trackId === track._id));
 
-      for (const track of selectedTracks) {
-        track.albumId = this.props.album._id;
-      }
-
       this.props.onPlaySelectedTracks(selectedTracks);
     } catch (error) {
       this._logger.log(this, error);
@@ -87,10 +85,6 @@ export default class AlbumTab extends React.Component {
     try {
       assert.ok(selectedTrackIds);
       const selectedTracks = this.state.tracks.filter(track => selectedTrackIds.some(trackId => trackId === track._id));
-
-      for (const track of selectedTracks) {
-        track.albumId = this.props.album._id;
-      }
 
       this.props.onQueueSelectedTracks(selectedTracks);
     } catch (error) {
