@@ -76,6 +76,7 @@ export default class App extends React.Component {
           <SearchTab
             tracksAboutApiClient={this._tracksAboutApiClient}
             containerHeightProvider={this.state.containerHeightProvider}
+            albumImagesCache={this._albumImagesCache}
             onSearchResultLoaded={this.handleEntityLoaded}
           />
         );
