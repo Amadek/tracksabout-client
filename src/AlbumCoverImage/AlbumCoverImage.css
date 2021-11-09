@@ -1,0 +1,15 @@
+.albumDetailsFadeIn {
+  visibility: hidden;
+}
+
+.albumCoverImage:hover .albumDetailsFadeIn {
+  animation-name: fadeIn;
+  animation-duration: 1s;
+  opacity: .5;
+  visibility: visible;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: .5; }
+}

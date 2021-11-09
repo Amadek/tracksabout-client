@@ -1,5 +1,5 @@
 import React from 'react';
-import AlbumCoverImage from '../AlbumCoverImage';
+import AlbumCoverImage from '../AlbumCoverImage/AlbumCoverImage';
 import assert from 'assert';
 import SearchResultType from './SearchResultType';
 

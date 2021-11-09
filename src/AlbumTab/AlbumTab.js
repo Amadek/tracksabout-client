@@ -7,7 +7,7 @@ import ContainerHeightProvider from '../ContainerHeightProvider';
 import TracksAboutApiClient from '../TracksAboutApiClient';
 import './AlbumTab.css';
 import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
-import AlbumCoverImage from '../AlbumCoverImage';
+import AlbumCoverImage from '../AlbumCoverImage/AlbumCoverImage';
 
 export default class AlbumTab extends React.Component {
   constructor (props) {

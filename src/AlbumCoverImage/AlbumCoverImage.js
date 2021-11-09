@@ -1,12 +1,15 @@
 import React from 'react';
-import Logger from './Logger';
+import Logger from '../Logger';
 import assert from 'assert';
-import AlbumImagesCache from './AlbumImagesCache/AlbumImagesCache';
+import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
+import './AlbumCoverImage.css';
 
 export default class AlbumCoverImage extends React.Component {
   constructor (props) {
     super(props);
     assert.ok(props.albumId);
+    assert.ok(props.albumName || true);
+    assert.ok(props.albumYear || true);
     assert.ok(props.albumImagesCache instanceof AlbumImagesCache);
     this._logger = new Logger();
     this._ignoreUpdate = false;
@@ -18,7 +21,12 @@ export default class AlbumCoverImage extends React.Component {
 
   render () {
     return (
-      <>
+      <div className='albumCoverImage' style={{ position: 'relative' }}>
+        {this.props.albumName && this.props.albumYear &&
+          <div className='p-3 bg-dark text-light albumDetailsFadeIn' style={{ position: 'absolute', width: '100%', height: '100%' }}>
+            <span className='fs-3'>{this.props.albumName}</span><br />
+            {this.props.albumYear}
+          </div>}
         <img
           ref={this.albumImg}
           src='#'
@@ -27,7 +35,7 @@ export default class AlbumCoverImage extends React.Component {
           style={{ width: '100%' }}
         />
         {this.state.albumCoverImageLoading && <div className='border' style={{ width: '100%', paddingTop: '100%' }} />}
-      </>
+      </div>
     );
   }
 

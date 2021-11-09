@@ -4,7 +4,7 @@ import Logger from '../Logger';
 import Alert from '../Alert';
 import ContainerHeightProvider from '../ContainerHeightProvider';
 import TracksAboutApiClient from '../TracksAboutApiClient';
-import AlbumCoverImage from '../AlbumCoverImage';
+import AlbumCoverImage from '../AlbumCoverImage/AlbumCoverImage';
 import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
 
 export default class ArtistTab extends React.Component {
@@ -28,9 +28,7 @@ export default class ArtistTab extends React.Component {
         className='m-2' role='button' style={{ width: '16rem' }}
         onClick={() => this.handleAlbumClick(album._id)}
       >
-        {/* TODO pokazywać to na hover {album.name}<br />
-        <span className='text-secondary'>{album.year}</span> */}
-        <AlbumCoverImage albumId={album._id} albumImagesCache={this.props.albumImagesCache} />
+        <AlbumCoverImage albumId={album._id} albumName={album.name} albumYear={album.year} albumImagesCache={this.props.albumImagesCache} />
       </div>
     );
 

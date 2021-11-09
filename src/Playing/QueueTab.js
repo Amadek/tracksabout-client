@@ -4,7 +4,7 @@ import TracksTable from '../TracksTable';
 import Logger from '../Logger';
 import PlayingQueue from './PlayingQueue';
 import ContainerHeightProvider from '../ContainerHeightProvider';
-import AlbumCoverImage from '../AlbumCoverImage';
+import AlbumCoverImage from '../AlbumCoverImage/AlbumCoverImage';
 import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
 
 export default class QueueTab extends React.Component {
