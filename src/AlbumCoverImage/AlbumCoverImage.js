@@ -10,13 +10,14 @@ export default class AlbumCoverImage extends React.Component {
     super(props);
     assert.ok(props.albumName || true);
     assert.ok(props.albumYear || true);
+    assert.ok(props.rotateImage || true);
     this.albumImg = React.createRef();
     this.state = { albumCoverImageLoading: true };
   }
 
   render () {
     return (
-      <div className='albumCoverImage' style={{ position: 'relative' }}>
+      <div className={'albumCoverImage ' + (this.props.rotateImage ? 'rotatingAlbumCoverImage' : '')} style={{ position: 'relative' }}>
         {this.props.albumName && this.props.albumYear &&
           <div className='p-3 bg-dark text-light albumDetailsFadeIn' style={{ position: 'absolute', width: '100%', height: '100%' }}>
             <span className='fs-3'>{this.props.albumName}</span><br />

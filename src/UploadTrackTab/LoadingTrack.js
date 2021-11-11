@@ -25,7 +25,7 @@ export default class LoadingTrack extends React.Component {
               <ul className='m-0 mt-2 text-secondary'>
                 <li>no. {this.props.track.number}</li>
                 <li>Title: {this.props.track.title}</li>
-                <li>Duration: {this.props.track.duration} s</li>
+                <li>Duration: {new Date(0, 0, 1, 0, 0, this.props.track.duration).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' })}</li>
                 <li>Album: {this.props.track.albumName}</li>
                 <li>Artist: {this.props.track.artistName}</li>
                 <li>Year: {this.props.track.year}</li>

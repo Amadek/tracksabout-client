@@ -5,7 +5,6 @@ import Alert from '../Alert';
 import TracksTable from '../TracksTable';
 import ContainerHeightProvider from '../ContainerHeightProvider';
 import TracksAboutApiClient from '../TracksAboutApiClient';
-import './AlbumTab.css';
 import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
 import DynamicAlbumCoverImage from '../AlbumCoverImage/DynamicAlbumCoverImage';
 

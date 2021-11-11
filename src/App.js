@@ -57,6 +57,7 @@ export default class App extends React.Component {
         {this.state.playingQueue.getTrackToPlay() &&
           <PlayBar
             tracksAboutApiClient={this._tracksAboutApiClient}
+            albumImagesCache={this._albumImagesCache}
             containerHeightProvider={this.state.containerHeightProvider}
             playingQueue={this.state.playingQueue}
             onPlayBarChanged={this.handlePlayBarChanged}
