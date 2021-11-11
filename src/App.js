@@ -69,7 +69,12 @@ export default class App extends React.Component {
     switch (navBarState) {
       case NavBarState.home:
       case NavBarState.upload:
-        return <UploadTrackTab tracksAboutApiClient={this._tracksAboutApiClient} containerHeightProvider={this.state.containerHeightProvider} />;
+        return (
+          <UploadTrackTab
+            tracksAboutApiClient={this._tracksAboutApiClient}
+            containerHeightProvider={this.state.containerHeightProvider}
+          />
+        );
 
       case NavBarState.search:
         return (

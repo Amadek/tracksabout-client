@@ -4,7 +4,7 @@ import TracksTable from '../TracksTable';
 import Logger from '../Logger';
 import PlayingQueue from './PlayingQueue';
 import ContainerHeightProvider from '../ContainerHeightProvider';
-import AlbumCoverImage from '../AlbumCoverImage/AlbumCoverImage';
+import DynamicAlbumCoverImage from '../AlbumCoverImage/DynamicAlbumCoverImage';
 import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
 
 export default class QueueTab extends React.Component {
@@ -34,7 +34,7 @@ export default class QueueTab extends React.Component {
               <li><i>{this.state.clickedTrack?.title}</i></li>
               <li>{this.state.clickedTrack && new Date(0, 0, 1, 0, 0, this.state.clickedTrack.duration).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' })}</li>
             </ul>
-            {this.state.clickedTrack && <AlbumCoverImage albumId={this.state.clickedTrack.albumId} albumImagesCache={this.props.albumImagesCache} />}
+            {this.state.clickedTrack && <DynamicAlbumCoverImage albumId={this.state.clickedTrack.albumId} albumImagesCache={this.props.albumImagesCache} />}
           </div>
           <div className='col-10 p-0' style={{ height: '100%', overflowY: 'auto' }}>
             <TracksTable

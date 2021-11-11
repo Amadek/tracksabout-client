@@ -7,7 +7,7 @@ import ContainerHeightProvider from '../ContainerHeightProvider';
 import TracksAboutApiClient from '../TracksAboutApiClient';
 import './AlbumTab.css';
 import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
-import AlbumCoverImage from '../AlbumCoverImage/AlbumCoverImage';
+import DynamicAlbumCoverImage from '../AlbumCoverImage/DynamicAlbumCoverImage';
 
 export default class AlbumTab extends React.Component {
   constructor (props) {
@@ -49,7 +49,7 @@ export default class AlbumTab extends React.Component {
             >Play
             </button>
             <div className='mt-3'>
-              <AlbumCoverImage albumId={this.props.album._id} albumImagesCache={this.props.albumImagesCache} />
+              <DynamicAlbumCoverImage albumId={this.props.album._id} albumImagesCache={this.props.albumImagesCache} />
             </div>
           </div>
           <div className='col-10 p-0' style={{ height: '100%', overflowY: 'auto' }}>

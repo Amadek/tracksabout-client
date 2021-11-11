@@ -1,5 +1,5 @@
 import React from 'react';
-import AlbumCoverImage from '../AlbumCoverImage/AlbumCoverImage';
+import DynamicAlbumCoverImage from '../AlbumCoverImage/DynamicAlbumCoverImage';
 import assert from 'assert';
 import SearchResultType from './SearchResultType';
 
@@ -22,7 +22,7 @@ export default class SearchResult extends React.Component {
               <div className='d-flex flex-row'>
                 {this._getAlbumId() &&
                   <div className='me-3 mt-2' style={{ width: '3rem' }}>
-                    <AlbumCoverImage albumId={this._getAlbumId()} albumImagesCache={this.props.albumImagesCache} />
+                    <DynamicAlbumCoverImage albumId={this._getAlbumId()} albumImagesCache={this.props.albumImagesCache} />
                   </div>}
                 <div>
                   {this.props.searchResult.title}
