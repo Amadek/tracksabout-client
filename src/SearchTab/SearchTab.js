@@ -5,12 +5,14 @@ import assert from 'assert';
 import SearchResult from './SearchResults';
 import Alert from '../Alert';
 import ContainerHeightProvider from '../ContainerHeightProvider';
+import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
 
 export default class SearchTab extends React.Component {
   constructor (props) {
     super(props);
-    assert.ok(this.props.tracksAboutApiClient);
+    assert.ok(props.tracksAboutApiClient);
     assert.ok(props.containerHeightProvider instanceof ContainerHeightProvider);
+    assert.ok(props.albumImagesCache instanceof AlbumImagesCache);
     this._logger = new Logger();
     this.handleSearchStarted = this._handleSearchStarted.bind(this);
     this.handleSearchResultClick = this._handleSearchResultClick.bind(this);
@@ -24,6 +26,7 @@ export default class SearchTab extends React.Component {
   render () {
     const searchResults = this.state.searchResults.map((s, index) =>
       <SearchResult
+        albumImagesCache={this.props.albumImagesCache}
         key={index} title={s.title}
         searchResult={s}
         onSearchResultClick={this.handleSearchResultClick}

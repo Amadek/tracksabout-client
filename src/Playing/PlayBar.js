@@ -3,12 +3,15 @@ import assert from 'assert';
 import Logger from '../Logger';
 import ContainerHeightProvider from '../ContainerHeightProvider';
 import TracksAboutApiClient from '../TracksAboutApiClient';
+import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
+import DynamicAlbumCoverImage from '../AlbumCoverImage/DynamicAlbumCoverImage';
 
 export default class PlayBar extends React.Component {
   constructor (props) {
     super(props);
     assert.ok(props.tracksAboutApiClient instanceof TracksAboutApiClient);
     assert.ok(props.containerHeightProvider instanceof ContainerHeightProvider);
+    assert.ok(props.albumImagesCache instanceof AlbumImagesCache);
     assert.ok(props.playingQueue);
     assert.ok(props.onPlayBarChanged);
 
@@ -41,7 +44,10 @@ export default class PlayBar extends React.Component {
         </div>
 
         <div className='d-flex align-items-center justify-content-between'>
-          <div className='w-100 p-3'>
+          <div className='w-100 d-flex align-items-center p-3'>
+            <div className='me-3 ' style={{ width: '2.5rem' }}>
+              <DynamicAlbumCoverImage albumId={this.props.playingQueue.getTrackToPlay().albumId} albumImagesCache={this.props.albumImagesCache} rotateImage={this.state.playing} />
+            </div>
             <span>{this.props.playingQueue.getTrackToPlay().title}</span>
           </div>
           <div className='d-flex align-items-center justify-content-center'>

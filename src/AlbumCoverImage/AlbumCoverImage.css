@@ -1,0 +1,27 @@
+.albumDetailsFadeIn {
+  visibility: hidden;
+}
+
+.albumCoverImage:hover .albumDetailsFadeIn {
+  animation-name: fadeIn;
+  animation-duration: 1s;
+  opacity: .5;
+  visibility: visible;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: .5; }
+}
+
+.rotatingAlbumCoverImage img {
+  animation: 3s rotateAlbumCover infinite;
+  animation-timing-function: linear;
+  border-radius: 100%
+}
+
+@keyframes rotateAlbumCover {
+  100% {
+    transform: rotate(-360deg);
+  }
+} 

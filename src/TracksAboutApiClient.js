@@ -37,6 +37,31 @@ export default class TracksAboutApiClient {
     }
   }
 
+  async getAlbumCover (albumId) {
+    assert.ok(albumId);
+    this._logger.log(this, 'Getting cover for album id: ' + albumId);
+
+    try {
+      const response = await fetch(`${this._tracksAboutApiUrl}/track/cover/${albumId}`, {
+        method: 'GET'
+      });
+
+      if (!response.ok) {
+        const getAlbumCoverError = await response.json();
+        this._logger.log(this, 'Getting album cover by album failed:\n' + JSON.stringify(getAlbumCoverError, null, 2));
+        return { success: false, message: getAlbumCoverError.message };
+      }
+
+      const trackCover = await response.json();
+
+      this._logger.log(this, 'Album cover found for album id:' + albumId);
+      return { success: true, trackCover };
+    } catch (error) {
+      this._logger.log(this, error);
+      return { success: false, message: error.message };
+    }
+  }
+
   async uploadTracks (files) {
     assert.ok(files);
     this._logger.log(this, 'Uploading files started.');

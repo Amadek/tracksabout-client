@@ -16,6 +16,7 @@ import PlayBar from './Playing/PlayBar';
 import PlayingQueue from './Playing/PlayingQueue';
 import QueueTab from './Playing/QueueTab';
 import ContainerHeightProvider from './ContainerHeightProvider';
+import AlbumImagesCache from './AlbumImagesCache/AlbumImagesCache';
 
 export default class App extends React.Component {
   constructor () {
@@ -23,6 +24,7 @@ export default class App extends React.Component {
     this._logger = new Logger();
     this._tracksAboutApiClient = new TracksAboutApiClient(new Logger());
     this._breadcrumbPathGenerator = new BreadcrumbPathGenerator();
+    this._albumImagesCache = new AlbumImagesCache(this._tracksAboutApiClient);
     this.handleNavItemClick = this._handleNavItemClick.bind(this);
     this.handleEntityLoaded = this._handleEntityLoaded.bind(this);
     this.handleTrackDoubleClick = this._handleTrackDoubleClick.bind(this);
@@ -55,6 +57,7 @@ export default class App extends React.Component {
         {this.state.playingQueue.getTrackToPlay() &&
           <PlayBar
             tracksAboutApiClient={this._tracksAboutApiClient}
+            albumImagesCache={this._albumImagesCache}
             containerHeightProvider={this.state.containerHeightProvider}
             playingQueue={this.state.playingQueue}
             onPlayBarChanged={this.handlePlayBarChanged}
@@ -67,13 +70,19 @@ export default class App extends React.Component {
     switch (navBarState) {
       case NavBarState.home:
       case NavBarState.upload:
-        return <UploadTrackTab tracksAboutApiClient={this._tracksAboutApiClient} containerHeightProvider={this.state.containerHeightProvider} />;
+        return (
+          <UploadTrackTab
+            tracksAboutApiClient={this._tracksAboutApiClient}
+            containerHeightProvider={this.state.containerHeightProvider}
+          />
+        );
 
       case NavBarState.search:
         return (
           <SearchTab
             tracksAboutApiClient={this._tracksAboutApiClient}
             containerHeightProvider={this.state.containerHeightProvider}
+            albumImagesCache={this._albumImagesCache}
             onSearchResultLoaded={this.handleEntityLoaded}
           />
         );
@@ -83,6 +92,7 @@ export default class App extends React.Component {
           <AlbumTab
             tracksAboutApiClient={this._tracksAboutApiClient}
             containerHeightProvider={this.state.containerHeightProvider}
+            albumImagesCache={this._albumImagesCache}
             album={this.state.loadedEntity}
             onArtistLoaded={this.handleEntityLoaded}
             onTrackDoubleClick={this.handleTrackDoubleClick}
@@ -96,6 +106,7 @@ export default class App extends React.Component {
           <ArtistTab
             tracksAboutApiClient={this._tracksAboutApiClient}
             containerHeightProvider={this.state.containerHeightProvider}
+            albumImagesCache={this._albumImagesCache}
             artist={this.state.loadedEntity}
             onAlbumLoaded={this.handleEntityLoaded}
           />
@@ -106,6 +117,7 @@ export default class App extends React.Component {
           <QueueTab
             playingQueue={this.state.playingQueue}
             containerHeightProvider={this.state.containerHeightProvider}
+            albumImagesCache={this._albumImagesCache}
             onRemoveSelectedTracks={this.handleRemoveSelectedTracks}
             onPlayFromSelectedTrack={this.handlePlayFromSelectedTrack}
           />

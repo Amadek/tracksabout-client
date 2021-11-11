@@ -5,18 +5,22 @@ import Alert from '../Alert';
 import TracksTable from '../TracksTable';
 import ContainerHeightProvider from '../ContainerHeightProvider';
 import TracksAboutApiClient from '../TracksAboutApiClient';
+import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
+import DynamicAlbumCoverImage from '../AlbumCoverImage/DynamicAlbumCoverImage';
 
 export default class AlbumTab extends React.Component {
   constructor (props) {
     super(props);
     assert.ok(props.containerHeightProvider instanceof ContainerHeightProvider);
     assert.ok(props.tracksAboutApiClient instanceof TracksAboutApiClient);
+    assert.ok(props.albumImagesCache instanceof AlbumImagesCache);
     assert.ok(props.onTrackDoubleClick);
     assert.ok(props.onPlaySelectedTracks);
     assert.ok(props.onQueueSelectedTracks);
     assert.ok(props.album?.tracks);
     this._logger = new Logger();
 
+    this.albumImg = React.createRef();
     this.handleArtistClick = this._handleArtistClick.bind(this);
     this.handlePlaySelectedTracks = this._handlePlaySelectedTracks.bind(this);
     this.handleQueueSelectedTracks = this._handleQueueSelectedTracks.bind(this);
@@ -32,17 +36,20 @@ export default class AlbumTab extends React.Component {
     return (
       <div className='container-fluid' style={{ ...this.props.containerHeightProvider.provideStyles() }}>
         <div className='row' style={{ height: '100%' }}>
-          <div className='col-2 p-3 bg-light border-end'>
+          <div className='col-2 p-3 bg-light border-end' style={{ height: '100%', overflowY: 'auto' }}>
             <ul className='list-unstyled'>
               <li className='fs-5'>{this.props.album.name}</li>
               <li className='text-secondary' role='button' onClick={this.handleArtistClick}>{this.props.album.artistName}</li>
               <li className='text-secondary'>{this.props.album.year}</li>
             </ul>
             <button
-              onClick={() => this.props.onTrackDoubleClick(this.props.album.tracks)}
+              onClick={() => this.handlePlaySelectedTracks([])}
               type='button' className='btn btn-outline-dark p-1' style={{ width: '100%', borderRadius: 0 }}
             >Play
             </button>
+            <div className='mt-3'>
+              <DynamicAlbumCoverImage albumId={this.props.album._id} albumImagesCache={this.props.albumImagesCache} />
+            </div>
           </div>
           <div className='col-10 p-0' style={{ height: '100%', overflowY: 'auto' }}>
             <div className='mx-3'>
@@ -63,7 +70,10 @@ export default class AlbumTab extends React.Component {
   _handlePlaySelectedTracks (selectedTrackIds) {
     try {
       assert.ok(selectedTrackIds);
-      const selectedTracks = this.state.tracks.filter(track => selectedTrackIds.some(trackId => trackId === track._id));
+      const selectedTracks = selectedTrackIds.length === 0
+        ? this.state.tracks
+        : this.state.tracks.filter(track => selectedTrackIds.some(trackId => trackId === track._id));
+
       this.props.onPlaySelectedTracks(selectedTracks);
     } catch (error) {
       this._logger.log(this, error);
@@ -74,6 +84,7 @@ export default class AlbumTab extends React.Component {
     try {
       assert.ok(selectedTrackIds);
       const selectedTracks = this.state.tracks.filter(track => selectedTrackIds.some(trackId => trackId === track._id));
+
       this.props.onQueueSelectedTracks(selectedTracks);
     } catch (error) {
       this._logger.log(this, error);
