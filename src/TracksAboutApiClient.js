@@ -6,6 +6,30 @@ export default class TracksAboutApiClient {
   constructor (logger) {
     assert.ok(logger); this._logger = logger;
     this._tracksAboutApiUrl = 'https://localhost:4000';
+    this._jwt = null;
+  }
+
+  async auth () {
+    try {
+      // If we already have JWT token, we are done.
+      if (this._jwt) return;
+
+      // If user come from auth redirect, we save JWT token fom URL to memory.
+      // Otherwise we redirect to authorize in API which redirect us back with JWT token in query params in URL.
+      const locationUrl = new URL(window.location.href);
+      if (locationUrl.searchParams.has('jwt')) {
+        this._jwt = locationUrl.searchParams.get('jwt');
+        return;
+      }
+
+      const authUrl = new URL(`${this._tracksAboutApiUrl}/auth`);
+      authUrl.searchParams.append('client_id', '0a1f813f4e2156f6e862');
+      authUrl.searchParams.append('redirect_url', 'https://localhost:3000');
+
+      window.location.href = authUrl.href;
+    } catch (error) {
+      this._logger.log(this, error);
+    }
   }
 
   async parseTrack (file) {
@@ -96,9 +120,10 @@ export default class TracksAboutApiClient {
     this._logger.log(this, `Searching for phrase: ${searchPhrase} started.`);
 
     try {
-      const response = await fetch(`${this._tracksAboutApiUrl}/search/${searchPhrase}`, {
-        method: 'GET'
-      });
+      const searchTrackUrl = new URL(`${this._tracksAboutApiUrl}/search/${searchPhrase}`);
+      searchTrackUrl.searchParams.append('jwt', this._jwt);
+
+      const response = await fetch(searchTrackUrl.href, { method: 'GET' });
 
       if (!response.ok) {
         const searchError = await response.json();

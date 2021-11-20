@@ -46,6 +46,8 @@ export default class App extends React.Component {
   }
 
   render () {
+    this._tracksAboutApiClient.auth();
+
     return (
       <>
         <Navbar onNavItemClick={this.handleNavItemClick} />
