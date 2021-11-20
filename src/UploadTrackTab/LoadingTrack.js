@@ -36,7 +36,7 @@ export default class LoadingTrack extends React.Component {
             <div className='text-danger mt-2'>{this.props.errorMessage}</div>}
         </div>
         <div className='col-2 d-flex align-items-center'>
-          {this.props.track &&
+          {this.props.track?.albumCover &&
             <div style={{ width: '100%' }}>
               <StaticAlbumCoverImage albumCover={this.props.track.albumCover} />
             </div>}
