@@ -9,17 +9,17 @@ export default class TracksAboutApiClient {
     this._jwt = null;
   }
 
-  async auth () {
+  auth () {
     try {
       // If we already have JWT token, we are done.
-      if (this._jwt) return;
+      if (this._jwt) return { redirect: false };
 
       // If user come from auth redirect, we save JWT token fom URL to memory.
       // Otherwise we redirect to authorize in API which redirect us back with JWT token in query params in URL.
       const locationUrl = new URL(window.location.href);
       if (locationUrl.searchParams.has('jwt')) {
         this._jwt = locationUrl.searchParams.get('jwt');
-        return;
+        return { redirect: false };
       }
 
       const authUrl = new URL(`${this._tracksAboutApiUrl}/auth`);
@@ -27,8 +27,32 @@ export default class TracksAboutApiClient {
       authUrl.searchParams.append('redirect_url', 'https://localhost:3000');
 
       window.location.href = authUrl.href;
+      return { redirect: true };
     } catch (error) {
       this._logger.log(this, error);
+    }
+  }
+
+  async getUser () {
+    try {
+      const getUserUrl = new URL(`${this._tracksAboutApiUrl}/user`);
+      getUserUrl.searchParams.append('jwt', this._jwt);
+
+      const response = await fetch(getUserUrl.href, { method: 'GET' });
+
+      if (!response.ok) {
+        const getUserError = await response.json();
+        this._logger.log(this, 'Getting user failed:\n' + JSON.stringify(getUserError, null, 2));
+        return { success: false, message: getUserError.message };
+      }
+
+      const user = await response.json();
+
+      this._logger.log(this, 'Getting user completed:\n' + JSON.stringify(user, null, 2));
+      return { success: true, user };
+    } catch (error) {
+      this._logger.log(this, error);
+      return { success: false, message: error.message };
     }
   }
 

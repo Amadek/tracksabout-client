@@ -17,6 +17,7 @@ import PlayingQueue from './Playing/PlayingQueue';
 import QueueTab from './Playing/QueueTab';
 import ContainerHeightProvider from './ContainerHeightProvider';
 import AlbumImagesCache from './AlbumImagesCache/AlbumImagesCache';
+import LoadingSite from './LoadingSite';
 
 export default class App extends React.Component {
   constructor () {
@@ -46,11 +47,14 @@ export default class App extends React.Component {
   }
 
   render () {
-    this._tracksAboutApiClient.auth();
+    const authResult = this._tracksAboutApiClient.auth();
+    if (authResult.redirect) {
+      return <LoadingSite />;
+    }
 
     return (
       <>
-        <Navbar onNavItemClick={this.handleNavItemClick} />
+        <Navbar tracksAboutApiClient={this._tracksAboutApiClient} onNavItemClick={this.handleNavItemClick} />
         <Breadcrumbs
           tracksAboutApiClient={this._tracksAboutApiClient} breadcrumbPath={this.state.breadcrumbPath}
           onBreadcrumbEntityLoaded={this.handleEntityLoaded} onBreadcrumbNavClick={this.handleNavItemClick}
