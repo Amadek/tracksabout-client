@@ -51,6 +51,13 @@ export default class TracksTable extends React.Component {
         {this.props.showAlbumColumn && <td>{track.albumName}</td>}
         {this.props.showArtistColumn && <td>{track.artistName}</td>}
         <td>{new Date(0, 0, 1, 0, 0, track.duration).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' })}</td>
+        <td>
+          {track.owner &&
+            <div>
+              <img alt='owner image' src={track.owner.avatarUrl} className='me-2 rounded-circle' style={{ width: '1.25rem' }} />
+              <span>{track.owner.login}</span>
+            </div>}
+        </td>
       </tr>
     );
 
@@ -65,6 +72,7 @@ export default class TracksTable extends React.Component {
             {this.props.showAlbumColumn && <th scope='col'>Album</th>}
             {this.props.showArtistColumn && <th scope='col'>Artist</th>}
             <th scope='col'>Duration</th>
+            <th scope='col'>Owner</th>
           </tr>
         </thead>
         <tbody>
