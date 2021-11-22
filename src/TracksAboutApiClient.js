@@ -120,7 +120,10 @@ export default class TracksAboutApiClient {
     }
 
     try {
-      const response = await fetch(`${this._tracksAboutApiUrl}/track`, {
+      const uploadTracksUrl = new URL(`${this._tracksAboutApiUrl}/track`);
+      uploadTracksUrl.searchParams.append('jwt', this._jwt);
+
+      const response = await fetch(uploadTracksUrl.href, {
         method: 'POST',
         body: formData
       });
