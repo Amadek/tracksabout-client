@@ -34,13 +34,15 @@ export default class App extends React.Component {
     this.handleRemoveSelectedTracks = this._handleRemoveSelectedTracks.bind(this);
     this.handlePlayBarChanged = this._handlePlayBarChanged.bind(this);
     this.handlePlayFromSelectedTrack = this._handlePlayFromSelectedTrack.bind(this);
+    this.handleGetUserError = this._handleGetUserError.bind(this);
 
     this.state = {
       navBarState: NavBarState.home,
       breadcrumbPath: [new BreadcrumbEntityData({ name: NavBarState.home, entityId: null })],
       loadedEntity: null,
       playingQueue: new PlayingQueue(),
-      containerHeightProvider: new ContainerHeightProvider(this._handleContainerHeightChanged.bind(this))
+      containerHeightProvider: new ContainerHeightProvider(this._handleContainerHeightChanged.bind(this)),
+      getUserErrorMessage: ''
     };
 
     this._breadcrumbPathGenerator.addToPath(new BreadcrumbNavData(this.state.navBarState));
@@ -52,9 +54,13 @@ export default class App extends React.Component {
       return <LoadingSite />;
     }
 
+    if (this.state.getUserErrorMessage) {
+      return <h1>{this.state.getUserErrorMessage}</h1>;
+    }
+
     return (
       <>
-        <Navbar tracksAboutApiClient={this._tracksAboutApiClient} onNavItemClick={this.handleNavItemClick} />
+        <Navbar tracksAboutApiClient={this._tracksAboutApiClient} onNavItemClick={this.handleNavItemClick} onGetUserError={this.handleGetUserError} />
         <Breadcrumbs
           tracksAboutApiClient={this._tracksAboutApiClient} breadcrumbPath={this.state.breadcrumbPath}
           onBreadcrumbEntityLoaded={this.handleEntityLoaded} onBreadcrumbNavClick={this.handleNavItemClick}
@@ -139,7 +145,6 @@ export default class App extends React.Component {
       assert.ok(navBarState);
 
       const breadcrumbData = new BreadcrumbNavData(navBarState);
-      // this._breadcrumbPathGenerator.clearPath();
       const breadcrumbPath = this._breadcrumbPathGenerator.addToPath(breadcrumbData);
 
       this.setState({ navBarState, breadcrumbPath });
@@ -257,6 +262,15 @@ export default class App extends React.Component {
     try {
       // We only need to refresh.
       this.setState({ containerHeightProvider: this.state.containerHeightProvider });
+    } catch (error) {
+      this._logger.log(this, error);
+    }
+  }
+
+  _handleGetUserError (errorMessage) {
+    try {
+      assert.ok(typeof errorMessage === 'string');
+      window.location.href = 'https://localhost:3000/';
     } catch (error) {
       this._logger.log(this, error);
     }

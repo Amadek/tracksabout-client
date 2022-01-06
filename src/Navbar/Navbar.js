@@ -9,6 +9,7 @@ export default class Navbar extends React.Component {
     super(props);
     assert.ok(props.tracksAboutApiClient instanceof TracksAboutApiClient);
     assert.ok(this.props.onNavItemClick);
+    assert.ok(this.props.onGetUserError);
     this._logger = new Logger();
 
     this.state = { user: null };
@@ -46,7 +47,9 @@ export default class Navbar extends React.Component {
   async componentDidMount () {
     try {
       const getUserResult = await this.props.tracksAboutApiClient.getUser();
-      if (!getUserResult.success) return;
+      if (!getUserResult.success) {
+        this.props.onGetUserError(getUserResult.message);
+      }
 
       this.setState({ user: getUserResult.user });
     } catch (error) {

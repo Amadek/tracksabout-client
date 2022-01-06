@@ -54,7 +54,7 @@ export default class TracksTable extends React.Component {
         <td>
           {track.owner &&
             <div>
-              <img alt='owner image' src={track.owner.avatarUrl} className='me-2 rounded-circle' style={{ width: '1.25rem' }} />
+              <img alt='owner_image' src={track.owner.avatarUrl} className='me-2 rounded-circle' style={{ width: '1.25rem' }} />
               <span>{track.owner.login}</span>
             </div>}
         </td>
