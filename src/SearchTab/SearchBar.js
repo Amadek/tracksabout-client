@@ -28,7 +28,7 @@ export default class SearchBar extends React.Component {
   render () {
     return (
       <form>
-        <input className='form-control' value={this.state.searchPhrase} onChange={this.handleChange} />
+        <input className='form-control' value={this.state.searchPhrase} onChange={this.handleChange} style={{ borderRadius: 0 }} />
       </form>
     );
   }

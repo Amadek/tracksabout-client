@@ -18,6 +18,7 @@ export default class AlbumTab extends React.Component {
     assert.ok(props.onPlaySelectedTracks);
     assert.ok(props.onQueueSelectedTracks);
     assert.ok(props.onArtistRemoved);
+    assert.ok(props.onDeletingSelectedTrack);
     assert.ok(props.album?.tracks);
     this._logger = new Logger();
 
@@ -29,6 +30,7 @@ export default class AlbumTab extends React.Component {
 
     this.state = {
       errorMessage: null,
+      message: null,
       tracks: this.props.album.tracks.sort((trackA, trackB) => trackA.number - trackB.number),
       selectedTracks: []
     };
@@ -54,9 +56,8 @@ export default class AlbumTab extends React.Component {
             </div>
           </div>
           <div className='col-10 p-0' style={{ height: '100%', overflowY: 'auto' }}>
-            <div className='mx-3'>
-              {this.state.errorMessage && <Alert message={this.state.errorMessage} />}
-            </div>
+            {this.state.errorMessage && <Alert message={this.state.errorMessage} className='mt-3 mx-3 mb-2' />}
+            {this.state.message && <Alert message={this.state.message} alertType='alert-success' className='mt-3 mx-3 mb-2' />}
             <TracksTable
               tracks={this.state.tracks}
               tracksAboutApiClient={this.props.tracksAboutApiClient}
@@ -99,6 +100,8 @@ export default class AlbumTab extends React.Component {
     try {
       assert.ok(selectedTrackId);
 
+      this.props.onDeletingSelectedTrack(selectedTrackId);
+
       const removeTrackResult = await this.props.tracksAboutApiClient.removeTrack(selectedTrackId);
       if (!removeTrackResult.success) {
         this._logger.log(this, `Remove track failed.\n${removeTrackResult.message}`);
@@ -107,7 +110,7 @@ export default class AlbumTab extends React.Component {
       }
 
       if (removeTrackResult.deletedObjectType === 'artist') {
-        this.props.onArtistRemoved();
+        this.props.onArtistRemoved(`Artist ${this.props.album.artistName} removed successfully.`);
         return;
       }
 
@@ -119,7 +122,7 @@ export default class AlbumTab extends React.Component {
           return;
         }
 
-        this.props.onArtistLoaded(searchArtistResult.obj);
+        this.props.onArtistLoaded(searchArtistResult.obj, `Album ${this.props.album.name} removed successfully.`);
         return;
       }
 
@@ -132,7 +135,8 @@ export default class AlbumTab extends React.Component {
         }
 
         const album = searchByIdResult.obj;
-        this.setState({ tracks: album.tracks.sort((trackA, trackB) => trackA.number - trackB.number) });
+        const removedTrack = this.props.album.tracks.find(t => t._id === selectedTrackId);
+        this.setState({ tracks: album.tracks.sort((trackA, trackB) => trackA.number - trackB.number), message: `Track ${removedTrack.title} deleted successfully.` });
         return;
       }
 

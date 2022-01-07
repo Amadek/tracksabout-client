@@ -40,7 +40,7 @@ export default class UploadTrackTab extends React.Component {
 
     return (
       <div className='container' style={{ ...this.props.containerHeightProvider.provideStyles(), overflowY: 'auto' }}>
-        {this.state.uploadingTracksErrorMessage && <Alert message={this.state.uploadingTracksErrorMessage} />}
+        {this.state.uploadingTracksErrorMessage && <Alert message={this.state.uploadingTracksErrorMessage} className='mt-3' />}
         <input
           type='file' className='visually-hidden' accept='audio/flac'
           multiple ref={fileInput => { this._fileInput = fileInput; }} onChange={this.handleFilesChange}

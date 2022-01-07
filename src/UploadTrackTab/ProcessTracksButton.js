@@ -14,6 +14,7 @@ export default class ProcessTracksButton extends React.Component {
         <div className='col d-grid py-3'>
           <button
             type='button' className={`btn btn-lg ${this._buttonColors[this.props.state]}`}
+            style={{ borderRadius: 0 }}
             disabled={[TrackState.none, TrackState.parsing, TrackState.uploading, TrackState.uploaded, TrackState.error].includes(this.props.state)}
             onClick={this.props.onClick}
           >
