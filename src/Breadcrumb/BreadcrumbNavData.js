@@ -6,7 +6,7 @@ export default class BreadcrumbNavData extends IBreadcrumbData {
   get navbarState () { return this._navbarState; }
 
   /**
-   * @param {import('../Navbar/NavbarState').default} navbarState 
+   * @param {import('../Navbar/NavbarState').default} navbarState
    */
   constructor (navbarState) {
     super();

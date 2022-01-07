@@ -1,11 +1,13 @@
 import React from 'react';
 import assert from 'assert';
 import Logger from './Logger';
+import TracksAboutApiClient from './TracksAboutApiClient';
 
 export default class TracksTable extends React.Component {
   constructor (props) {
     super(props);
     assert.ok(props.tracks);
+    assert.ok(props.tracksAboutApiClient instanceof TracksAboutApiClient);
     assert.ok(props.playingTrackId || true);
     assert.ok(props.onTrackClick || true);
     assert.ok(props.onTrackDoubleClick || true);
@@ -19,7 +21,7 @@ export default class TracksTable extends React.Component {
 
     this.handleTrackClick = this._handleTrackClick.bind(this);
 
-    this.state = { selectedTrackIds: [] };
+    this.state = { selectedTrackIds: [], user: null };
   }
 
   render () {
@@ -45,6 +47,7 @@ export default class TracksTable extends React.Component {
                 {this.props.onQueueSelectedTracks && <li><button className='dropdown-item' onClick={() => this.props.onQueueSelectedTracks(this.state.selectedTrackIds)}>Add to queue</button></li>}
                 {this.props.onRemoveSelectedTracks && <li><button className='dropdown-item' onClick={() => this.props.onRemoveSelectedTracks(this.state.selectedTrackIds)}>Remove</button></li>}
                 {this.props.onPlayFromSelectedTrack && <li><button className='dropdown-item' onClick={() => this.props.onPlayFromSelectedTrack(track._id)}>Play</button></li>}
+                {this.props.onDeleteSelectedTrack && /* track.owner?._id === this.state.user?._id && */ <li><button className='dropdown-item' onClick={() => this.props.onDeleteSelectedTrack(track._id)}>Delete</button></li>}
               </ul>
             </div>}
         </td>
@@ -82,13 +85,18 @@ export default class TracksTable extends React.Component {
     );
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     try {
       // Select first track as default behavior.
       if (!this.props.tracks[0]) return;
 
       this.state.selectedTrackIds.push(this.props.tracks[0]._id);
-      this.setState({ selectedTrackIds: this.state.selectedTrackIds }, () => this.props.onTrackClick && this.props.onTrackClick(this.props.tracks[0]));
+      const getUserResult = await this.props.tracksAboutApiClient.getUser();
+
+      this.setState({
+        selectedTrackIds: this.state.selectedTrackIds,
+        user: getUserResult.user
+      }, () => this.props.onTrackClick && this.props.onTrackClick(this.props.tracks[0]));
     } catch (error) {
       this._logger.log(this, error);
     }

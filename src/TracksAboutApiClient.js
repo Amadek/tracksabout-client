@@ -142,6 +142,32 @@ export default class TracksAboutApiClient {
     }
   }
 
+  async removeTrack (trackId) {
+    assert.ok(trackId);
+
+    try {
+      const removeTrackUrl = new URL(`${this._tracksAboutApiUrl}/track/${trackId}`);
+      removeTrackUrl.searchParams.append('jwt', this._jwt);
+
+      const response = await fetch(removeTrackUrl.href, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        const removeTrackError = await response.json();
+        this._logger.log(this, 'Removing track failed:\n' + JSON.stringify(removeTrackError, null, 2));
+        return { success: false, message: removeTrackError.message };
+      }
+
+      const removeTrackResult = await response.json();
+      this._logger.log(this, `Track ${trackId} removed, deleted object type: ${removeTrackResult.deletedObjectType}.`);
+      return { success: true, deletedObjectType: removeTrackResult.deletedObjectType };
+    } catch (error) {
+      this._logger.log(this, error);
+      return { success: false, message: error.message };
+    }
+  }
+
   async search (searchPhrase) {
     assert.ok(searchPhrase);
     this._logger.log(this, `Searching for phrase: ${searchPhrase} started.`);

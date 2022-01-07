@@ -34,6 +34,7 @@ export default class App extends React.Component {
     this.handleRemoveSelectedTracks = this._handleRemoveSelectedTracks.bind(this);
     this.handlePlayBarChanged = this._handlePlayBarChanged.bind(this);
     this.handlePlayFromSelectedTrack = this._handlePlayFromSelectedTrack.bind(this);
+    this.handleArtistRemoved = this._handleArtistRemoved.bind(this);
     this.handleGetUserError = this._handleGetUserError.bind(this);
 
     this.state = {
@@ -110,6 +111,7 @@ export default class App extends React.Component {
             onTrackDoubleClick={this.handleTrackDoubleClick}
             onPlaySelectedTracks={this.handlePlaySelectedTracks}
             onQueueSelectedTracks={this.handleQueueSelectedTracks}
+            onArtistRemoved={this.handleArtistRemoved}
           />
         );
 
@@ -262,6 +264,17 @@ export default class App extends React.Component {
     try {
       // We only need to refresh.
       this.setState({ containerHeightProvider: this.state.containerHeightProvider });
+    } catch (error) {
+      this._logger.log(this, error);
+    }
+  }
+
+  _handleArtistRemoved () {
+    try {
+      const breadcrumbData = new BreadcrumbNavData(NavBarState.search);
+      const breadcrumbPath = this._breadcrumbPathGenerator.addToPath(breadcrumbData);
+
+      this.setState({ navBarState: NavBarState.search, breadcrumbPath });
     } catch (error) {
       this._logger.log(this, error);
     }

@@ -17,6 +17,7 @@ export default class AlbumTab extends React.Component {
     assert.ok(props.onTrackDoubleClick);
     assert.ok(props.onPlaySelectedTracks);
     assert.ok(props.onQueueSelectedTracks);
+    assert.ok(props.onArtistRemoved);
     assert.ok(props.album?.tracks);
     this._logger = new Logger();
 
@@ -24,9 +25,10 @@ export default class AlbumTab extends React.Component {
     this.handleArtistClick = this._handleArtistClick.bind(this);
     this.handlePlaySelectedTracks = this._handlePlaySelectedTracks.bind(this);
     this.handleQueueSelectedTracks = this._handleQueueSelectedTracks.bind(this);
+    this.handleDeleteSelectedTrack = this._handleDeleteSelectedTrack.bind(this);
 
     this.state = {
-      searchArtistErrorMessage: null,
+      errorMessage: null,
       tracks: this.props.album.tracks.sort((trackA, trackB) => trackA.number - trackB.number),
       selectedTracks: []
     };
@@ -53,13 +55,15 @@ export default class AlbumTab extends React.Component {
           </div>
           <div className='col-10 p-0' style={{ height: '100%', overflowY: 'auto' }}>
             <div className='mx-3'>
-              {this.state.searchArtistErrorMessage && <Alert message={this.state.searchArtistErrorMessage} />}
+              {this.state.errorMessage && <Alert message={this.state.errorMessage} />}
             </div>
             <TracksTable
               tracks={this.state.tracks}
+              tracksAboutApiClient={this.props.tracksAboutApiClient}
               onTrackDoubleClick={this.props.onTrackDoubleClick}
               onPlaySelectedTracks={this.handlePlaySelectedTracks}
               onQueueSelectedTracks={this.handleQueueSelectedTracks}
+              onDeleteSelectedTrack={this.handleDeleteSelectedTrack}
             />
           </div>
         </div>
@@ -91,12 +95,60 @@ export default class AlbumTab extends React.Component {
     }
   }
 
+  async _handleDeleteSelectedTrack (selectedTrackId) {
+    try {
+      assert.ok(selectedTrackId);
+
+      const removeTrackResult = await this.props.tracksAboutApiClient.removeTrack(selectedTrackId);
+      console.log(removeTrackResult);
+      if (!removeTrackResult.success) {
+        this._logger.log(this, `Remove track failed.\n${removeTrackResult.message}`);
+        this.setState({ errorMessage: removeTrackResult.message });
+        return;
+      }
+
+      if (removeTrackResult.deletedObjectType === 'artist') {
+        this.props.onArtistRemoved();
+        return;
+      }
+
+      if (removeTrackResult.deletedObjectType === 'album') {
+        const searchArtistResult = await this.props.tracksAboutApiClient.searchById(this.props.album.artistId);
+        if (!searchArtistResult.success) {
+          this._logger.log(this, `Search artist by Id failed.\n${searchArtistResult.message}`);
+          this.setState({ errorMessage: searchArtistResult.message });
+          return;
+        }
+
+        this.props.onArtistLoaded(searchArtistResult.obj);
+        return;
+      }
+
+      if (removeTrackResult.deletedObjectType === 'track') {
+        const searchByIdResult = await this.props.tracksAboutApiClient.searchById(this.props.album._id);
+        if (!searchByIdResult.success) {
+          this._logger.log(this, 'Search album by Id failed.');
+          this.setState({ errorMessage: searchByIdResult.message });
+          return;
+        }
+
+        const album = searchByIdResult.obj;
+        this.setState({ tracks: album.tracks.sort((trackA, trackB) => trackA.number - trackB.number) });
+        return;
+      }
+
+      throw new Error('Unsupported deleted object type: ' + removeTrackResult.deletedObjectType);
+    } catch (error) {
+      this._logger.log(this, error);
+    }
+  }
+
   async _handleArtistClick () {
     try {
       const searchArtistResult = await this.props.tracksAboutApiClient.searchById(this.props.album.artistId);
       if (!searchArtistResult.success) {
         this._logger.log(this, `Search artist by Id failed.\n${searchArtistResult.message}`);
-        this.setState({ searchArtistErrorMessage: searchArtistResult.message });
+        this.setState({ errorMessage: searchArtistResult.message });
         return;
       }
 
