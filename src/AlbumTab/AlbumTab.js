@@ -100,7 +100,6 @@ export default class AlbumTab extends React.Component {
       assert.ok(selectedTrackId);
 
       const removeTrackResult = await this.props.tracksAboutApiClient.removeTrack(selectedTrackId);
-      console.log(removeTrackResult);
       if (!removeTrackResult.success) {
         this._logger.log(this, `Remove track failed.\n${removeTrackResult.message}`);
         this.setState({ errorMessage: removeTrackResult.message });
