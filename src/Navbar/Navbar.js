@@ -37,6 +37,7 @@ export default class Navbar extends React.Component {
               <div>
                 <img src={this.state.user.avatarUrl} alt='avatar url' className='me-2 rounded-circle' style={{ width: '2rem' }} />
                 <span className='text-white me-1'>{this.state.user.login}</span>
+                {this.state.user.isAdmin && <span className='text-secondary me-1'>| administrator</span>}
               </div>}
           </div>
         </div>
