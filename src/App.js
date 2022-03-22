@@ -191,14 +191,11 @@ export default class App extends React.Component {
     }
   }
 
-  _handleTrackDoubleClick (albumTracks) {
+  _handleTrackDoubleClick (track) {
     try {
-      assert.ok(albumTracks);
-
+      assert.ok(track);
       this.state.playingQueue.reset();
-      for (const albumTrack of albumTracks) {
-        this.state.playingQueue.addToQueue(albumTrack);
-      }
+      this.state.playingQueue.addToQueue(track);
 
       this.setState({ playingQueue: this.state.playingQueue });
     } catch (error) {
@@ -261,10 +258,10 @@ export default class App extends React.Component {
     }
   }
 
-  _handlePlayFromSelectedTrack (selectedTrackId) {
+  _handlePlayFromSelectedTrack (track) {
     try {
-      assert.ok(selectedTrackId);
-      this.state.playingQueue.moveQueue(selectedTrackId);
+      assert.ok(track);
+      this.state.playingQueue.moveQueue(track._id);
       this.setState({ playingQueue: this.state.playingQueue });
     } catch (error) {
       this._logger.log(this, error);

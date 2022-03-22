@@ -46,6 +46,7 @@ export default class QueueTab extends React.Component {
               onTrackClick={this.handleTrackClick}
               onRemoveSelectedTracks={this.props.onRemoveSelectedTracks}
               onPlayFromSelectedTrack={this.props.onPlayFromSelectedTrack}
+              onTrackDoubleClick={this.props.onPlayFromSelectedTrack}
               showAlbumColumn
               showArtistColumn
             />

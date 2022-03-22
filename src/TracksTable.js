@@ -46,7 +46,7 @@ export default class TracksTable extends React.Component {
                 {this.props.onPlaySelectedTracks && <li><button className='dropdown-item' onClick={() => this.props.onPlaySelectedTracks(this.state.selectedTrackIds)}>Play</button></li>}
                 {this.props.onQueueSelectedTracks && <li><button className='dropdown-item' onClick={() => this.props.onQueueSelectedTracks(this.state.selectedTrackIds)}>Add to queue</button></li>}
                 {this.props.onRemoveSelectedTracks && <li><button className='dropdown-item' onClick={() => this.props.onRemoveSelectedTracks(this.state.selectedTrackIds)}>Remove</button></li>}
-                {this.props.onPlayFromSelectedTrack && <li><button className='dropdown-item' onClick={() => this.props.onPlayFromSelectedTrack(track._id)}>Play</button></li>}
+                {this.props.onPlayFromSelectedTrack && <li><button className='dropdown-item' onClick={() => this.props.onPlayFromSelectedTrack(track)}>Play</button></li>}
                 {this.props.onDeleteSelectedTrack && (this.state.user?.isAdmin || track.owner?._id === this.state.user?._id) && <li><button className='dropdown-item' onClick={() => this.props.onDeleteSelectedTrack(track._id)}>Delete</button></li>}
               </ul>
             </div>}
