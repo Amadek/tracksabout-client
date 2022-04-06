@@ -99,8 +99,8 @@ export default class PlayBar extends React.Component {
 
   componentDidUpdate () {
     try {
-      // We only force playing in componenent when playing queue hash has changed.
-      if (this._playingQueueHash === this.props.playingQueue.hash) return;
+      // We only force playing in componenent when playing queue hash has changed and playing is turned on.
+      if (this._playingQueueHash === this.props.playingQueue.hash || !this.state.playing) return;
 
       const playingTrack = this.props.playingQueue.getTrackToPlay();
       this._logger.log(this, 'Playing track on updating component: ' + playingTrack.title);
