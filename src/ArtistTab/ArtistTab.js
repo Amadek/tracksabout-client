@@ -13,6 +13,7 @@ export default class ArtistTab extends React.Component {
     assert.ok(props.tracksAboutApiClient instanceof TracksAboutApiClient);
     assert.ok(props.containerHeightProvider instanceof ContainerHeightProvider);
     assert.ok(props.albumImagesCache instanceof AlbumImagesCache);
+    assert.ok(props.message || true);
     this._logger = new Logger();
 
     this.handleAlbumClick = this._handleAlbumClick.bind(this);
@@ -40,7 +41,8 @@ export default class ArtistTab extends React.Component {
               {this.props.artist.name}
             </div>
             <div className='p-2'>
-              {this.state.searchAlbumErrorMessage && <Alert message={this.state.searchAlbumErrorMessage} />}
+              {this.state.searchAlbumErrorMessage && <Alert message={this.state.searchAlbumErrorMessage} className='m-2' />}
+              {this.props.message && <Alert message={this.props.message} alertType='alert-success' className='m-2' />}
               <div className='d-flex flex-wrap'>
                 {albums}
               </div>

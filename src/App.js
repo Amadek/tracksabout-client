@@ -17,6 +17,7 @@ import PlayingQueue from './Playing/PlayingQueue';
 import QueueTab from './Playing/QueueTab';
 import ContainerHeightProvider from './ContainerHeightProvider';
 import AlbumImagesCache from './AlbumImagesCache/AlbumImagesCache';
+import LoadingSite from './LoadingSite';
 
 export default class App extends React.Component {
   constructor () {
@@ -33,22 +34,37 @@ export default class App extends React.Component {
     this.handleRemoveSelectedTracks = this._handleRemoveSelectedTracks.bind(this);
     this.handlePlayBarChanged = this._handlePlayBarChanged.bind(this);
     this.handlePlayFromSelectedTrack = this._handlePlayFromSelectedTrack.bind(this);
+    this.handleArtistRemoved = this._handleArtistRemoved.bind(this);
+    this.handleDeletingSelectedTrack = this._handleDeletingSelectedTrack.bind(this);
+    this.handleGetUserError = this._handleGetUserError.bind(this);
 
     this.state = {
       navBarState: NavBarState.home,
       breadcrumbPath: [new BreadcrumbEntityData({ name: NavBarState.home, entityId: null })],
       loadedEntity: null,
       playingQueue: new PlayingQueue(),
-      containerHeightProvider: new ContainerHeightProvider(this._handleContainerHeightChanged.bind(this))
+      containerHeightProvider: new ContainerHeightProvider(this._handleContainerHeightChanged.bind(this)),
+      getUserErrorMessage: '',
+      searchTabMessage: '',
+      message: ''
     };
 
     this._breadcrumbPathGenerator.addToPath(new BreadcrumbNavData(this.state.navBarState));
   }
 
   render () {
+    const authResult = this._tracksAboutApiClient.auth();
+    if (authResult.redirect) {
+      return <LoadingSite />;
+    }
+
+    if (this.state.getUserErrorMessage) {
+      return <h1>{this.state.getUserErrorMessage}</h1>;
+    }
+
     return (
       <>
-        <Navbar onNavItemClick={this.handleNavItemClick} />
+        <Navbar tracksAboutApiClient={this._tracksAboutApiClient} onNavItemClick={this.handleNavItemClick} onGetUserError={this.handleGetUserError} />
         <Breadcrumbs
           tracksAboutApiClient={this._tracksAboutApiClient} breadcrumbPath={this.state.breadcrumbPath}
           onBreadcrumbEntityLoaded={this.handleEntityLoaded} onBreadcrumbNavClick={this.handleNavItemClick}
@@ -84,6 +100,7 @@ export default class App extends React.Component {
             containerHeightProvider={this.state.containerHeightProvider}
             albumImagesCache={this._albumImagesCache}
             onSearchResultLoaded={this.handleEntityLoaded}
+            searchTabMessage={this.state.searchTabMessage}
           />
         );
 
@@ -98,6 +115,8 @@ export default class App extends React.Component {
             onTrackDoubleClick={this.handleTrackDoubleClick}
             onPlaySelectedTracks={this.handlePlaySelectedTracks}
             onQueueSelectedTracks={this.handleQueueSelectedTracks}
+            onDeletingSelectedTrack={this.handleDeletingSelectedTrack}
+            onArtistRemoved={this.handleArtistRemoved}
           />
         );
 
@@ -109,12 +128,15 @@ export default class App extends React.Component {
             albumImagesCache={this._albumImagesCache}
             artist={this.state.loadedEntity}
             onAlbumLoaded={this.handleEntityLoaded}
+            onDeletingSelectedTrack={this.handleDeletingSelectedTrack}
+            message={this.state.message}
           />
         );
 
       case NavBarState.queue:
         return (
           <QueueTab
+            tracksAboutApiClient={this._tracksAboutApiClient}
             playingQueue={this.state.playingQueue}
             containerHeightProvider={this.state.containerHeightProvider}
             albumImagesCache={this._albumImagesCache}
@@ -133,10 +155,9 @@ export default class App extends React.Component {
       assert.ok(navBarState);
 
       const breadcrumbData = new BreadcrumbNavData(navBarState);
-      // this._breadcrumbPathGenerator.clearPath();
       const breadcrumbPath = this._breadcrumbPathGenerator.addToPath(breadcrumbData);
 
-      this.setState({ navBarState, breadcrumbPath });
+      this.setState({ navBarState, breadcrumbPath, searchTabMessage: '' });
     } catch (error) {
       this._logger.log(this, error);
     }
@@ -145,8 +166,9 @@ export default class App extends React.Component {
   /**
    * Based on loaded entity (album or artist) routes to specific tab.
    * @param {*} entity
+   * @param {string} message
    */
-  _handleEntityLoaded (entity) {
+  _handleEntityLoaded (entity, message) {
     try {
       const navBarState = this._getNavBarState(entity.type);
       this._logger.log(this, `Route to ${navBarState} tab.`);
@@ -154,7 +176,7 @@ export default class App extends React.Component {
       const breadcrumbData = new BreadcrumbEntityData({ name: entity.name, entityId: entity._id });
       const breadcrumbPath = this._breadcrumbPathGenerator.addToPath(breadcrumbData);
 
-      this.setState({ navBarState, breadcrumbPath, loadedEntity: entity });
+      this.setState({ navBarState, breadcrumbPath, loadedEntity: entity, message });
     } catch (error) {
       this._logger.log(this, error);
     }
@@ -169,14 +191,11 @@ export default class App extends React.Component {
     }
   }
 
-  _handleTrackDoubleClick (albumTracks) {
+  _handleTrackDoubleClick (track) {
     try {
-      assert.ok(albumTracks);
-
+      assert.ok(track);
       this.state.playingQueue.reset();
-      for (const albumTrack of albumTracks) {
-        this.state.playingQueue.addToQueue(albumTrack);
-      }
+      this.state.playingQueue.addToQueue(track);
 
       this.setState({ playingQueue: this.state.playingQueue });
     } catch (error) {
@@ -227,10 +246,22 @@ export default class App extends React.Component {
     }
   }
 
-  _handlePlayFromSelectedTrack (selectedTrackId) {
+  _handleDeletingSelectedTrack (selectedTrackId) {
     try {
       assert.ok(selectedTrackId);
-      this.state.playingQueue.moveQueue(selectedTrackId);
+
+      if (this.state.playingQueue.getTrackToPlay()) this.state.playingQueue.removeFromQueue(selectedTrackId);
+
+      this.setState({ playingQueue: this.state.playingQueue });
+    } catch (error) {
+      this._logger.log(this, error);
+    }
+  }
+
+  _handlePlayFromSelectedTrack (track) {
+    try {
+      assert.ok(track);
+      this.state.playingQueue.moveQueue(track._id);
       this.setState({ playingQueue: this.state.playingQueue });
     } catch (error) {
       this._logger.log(this, error);
@@ -251,6 +282,26 @@ export default class App extends React.Component {
     try {
       // We only need to refresh.
       this.setState({ containerHeightProvider: this.state.containerHeightProvider });
+    } catch (error) {
+      this._logger.log(this, error);
+    }
+  }
+
+  _handleArtistRemoved (message) {
+    try {
+      const breadcrumbData = new BreadcrumbNavData(NavBarState.search);
+      const breadcrumbPath = this._breadcrumbPathGenerator.addToPath(breadcrumbData);
+
+      this.setState({ navBarState: NavBarState.search, breadcrumbPath, searchTabMessage: message });
+    } catch (error) {
+      this._logger.log(this, error);
+    }
+  }
+
+  _handleGetUserError (errorMessage) {
+    try {
+      assert.ok(typeof errorMessage === 'string');
+      window.location.href = 'https://localhost:3000/';
     } catch (error) {
       this._logger.log(this, error);
     }

@@ -13,6 +13,7 @@ export default class SearchTab extends React.Component {
     assert.ok(props.tracksAboutApiClient);
     assert.ok(props.containerHeightProvider instanceof ContainerHeightProvider);
     assert.ok(props.albumImagesCache instanceof AlbumImagesCache);
+    assert.ok(props.searchTabMessage || true);
     this._logger = new Logger();
     this.handleSearchStarted = this._handleSearchStarted.bind(this);
     this.handleSearchResultClick = this._handleSearchResultClick.bind(this);
@@ -34,7 +35,11 @@ export default class SearchTab extends React.Component {
 
     return (
       <div className='container pt-3' style={{ ...this.props.containerHeightProvider.provideStyles(), overflowY: 'auto' }}>
-        {this.state.searchErrorMessage && <Alert message={this.state.searchErrorMessage} />}
+        {this.state.searchErrorMessage && <Alert message={this.state.searchErrorMessage} className='mb-3' />}
+        {this.props.searchTabMessage && <Alert message={this.props.searchTabMessage} alertType='alert-success' className='mb-3' />}
+        <div className='mb-1'>
+          Search by artist, album or track name:
+        </div>
         <SearchBar onSearchStarted={this.handleSearchStarted} />
         {searchResults}
       </div>

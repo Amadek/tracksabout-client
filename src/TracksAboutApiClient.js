@@ -6,6 +6,54 @@ export default class TracksAboutApiClient {
   constructor (logger) {
     assert.ok(logger); this._logger = logger;
     this._tracksAboutApiUrl = 'https://localhost:4000';
+    this._jwt = null;
+  }
+
+  auth () {
+    try {
+      // If we already have JWT token, we are done.
+      if (this._jwt) return { redirect: false };
+
+      // If user come from auth redirect, we save JWT token fom URL to memory.
+      // Otherwise we redirect to authorize in API which redirect us back with JWT token in query params in URL.
+      const locationUrl = new URL(window.location.href);
+      if (locationUrl.searchParams.has('jwt')) {
+        this._jwt = locationUrl.searchParams.get('jwt');
+        return { redirect: false };
+      }
+
+      const authUrl = new URL(`${this._tracksAboutApiUrl}/auth`);
+      authUrl.searchParams.append('client_id', '0a1f813f4e2156f6e862');
+      authUrl.searchParams.append('redirect_url', 'https://localhost:3000');
+
+      window.location.href = authUrl.href;
+      return { redirect: true };
+    } catch (error) {
+      this._logger.log(this, error);
+    }
+  }
+
+  async getUser () {
+    try {
+      const getUserUrl = new URL(`${this._tracksAboutApiUrl}/user`);
+      getUserUrl.searchParams.append('jwt', this._jwt);
+
+      const response = await fetch(getUserUrl.href, { method: 'GET' });
+
+      if (!response.ok) {
+        const getUserError = await response.json();
+        this._logger.log(this, 'Getting user failed:\n' + JSON.stringify(getUserError, null, 2));
+        return { success: false, message: getUserError.message };
+      }
+
+      const user = await response.json();
+
+      this._logger.log(this, 'Getting user completed:\n' + JSON.stringify(user, null, 2));
+      return { success: true, user };
+    } catch (error) {
+      this._logger.log(this, error);
+      return { success: false, message: error.message };
+    }
   }
 
   async parseTrack (file) {
@@ -72,7 +120,10 @@ export default class TracksAboutApiClient {
     }
 
     try {
-      const response = await fetch(`${this._tracksAboutApiUrl}/track`, {
+      const uploadTracksUrl = new URL(`${this._tracksAboutApiUrl}/track`);
+      uploadTracksUrl.searchParams.append('jwt', this._jwt);
+
+      const response = await fetch(uploadTracksUrl.href, {
         method: 'POST',
         body: formData
       });
@@ -91,14 +142,41 @@ export default class TracksAboutApiClient {
     }
   }
 
+  async removeTrack (trackId) {
+    assert.ok(trackId);
+
+    try {
+      const removeTrackUrl = new URL(`${this._tracksAboutApiUrl}/track/${trackId}`);
+      removeTrackUrl.searchParams.append('jwt', this._jwt);
+
+      const response = await fetch(removeTrackUrl.href, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        const removeTrackError = await response.json();
+        this._logger.log(this, 'Removing track failed:\n' + JSON.stringify(removeTrackError, null, 2));
+        return { success: false, message: removeTrackError.message };
+      }
+
+      const removeTrackResult = await response.json();
+      this._logger.log(this, `Track ${trackId} removed, deleted object type: ${removeTrackResult.deletedObjectType}.`);
+      return { success: true, deletedObjectType: removeTrackResult.deletedObjectType };
+    } catch (error) {
+      this._logger.log(this, error);
+      return { success: false, message: error.message };
+    }
+  }
+
   async search (searchPhrase) {
     assert.ok(searchPhrase);
     this._logger.log(this, `Searching for phrase: ${searchPhrase} started.`);
 
     try {
-      const response = await fetch(`${this._tracksAboutApiUrl}/search/${searchPhrase}`, {
-        method: 'GET'
-      });
+      const searchTrackUrl = new URL(`${this._tracksAboutApiUrl}/search/${searchPhrase}`);
+      searchTrackUrl.searchParams.append('jwt', this._jwt);
+
+      const response = await fetch(searchTrackUrl.href, { method: 'GET' });
 
       if (!response.ok) {
         const searchError = await response.json();

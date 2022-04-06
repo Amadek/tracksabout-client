@@ -6,10 +6,12 @@ import PlayingQueue from './PlayingQueue';
 import ContainerHeightProvider from '../ContainerHeightProvider';
 import DynamicAlbumCoverImage from '../AlbumCoverImage/DynamicAlbumCoverImage';
 import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
+import TracksAboutApiClient from '../TracksAboutApiClient';
 
 export default class QueueTab extends React.Component {
   constructor (props) {
     super(props);
+    assert.ok(props.tracksAboutApiClient instanceof TracksAboutApiClient);
     assert.ok(props.playingQueue instanceof PlayingQueue);
     assert.ok(props.containerHeightProvider instanceof ContainerHeightProvider);
     assert.ok(props.albumImagesCache instanceof AlbumImagesCache);
@@ -38,11 +40,13 @@ export default class QueueTab extends React.Component {
           </div>
           <div className='col-10 p-0' style={{ height: '100%', overflowY: 'auto' }}>
             <TracksTable
+              tracksAboutApiClient={this.props.tracksAboutApiClient}
               tracks={this.props.playingQueue.queuedTracks}
               playingTrackId={this.props.playingQueue.getTrackToPlay()?._id}
               onTrackClick={this.handleTrackClick}
               onRemoveSelectedTracks={this.props.onRemoveSelectedTracks}
               onPlayFromSelectedTrack={this.props.onPlayFromSelectedTrack}
+              onTrackDoubleClick={this.props.onPlayFromSelectedTrack}
               showAlbumColumn
               showArtistColumn
             />
