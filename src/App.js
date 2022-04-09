@@ -18,6 +18,7 @@ import QueueTab from './Playing/QueueTab';
 import ContainerHeightProvider from './ContainerHeightProvider';
 import AlbumImagesCache from './AlbumImagesCache/AlbumImagesCache';
 import LoadingSite from './LoadingSite';
+import Alert from './Alert';
 
 export default class App extends React.Component {
   constructor () {
@@ -64,6 +65,7 @@ export default class App extends React.Component {
 
     return (
       <>
+        <Alert message='DUPSKO' />
         <Navbar tracksAboutApiClient={this._tracksAboutApiClient} onNavItemClick={this.handleNavItemClick} onGetUserError={this.handleGetUserError} />
         <Breadcrumbs
           tracksAboutApiClient={this._tracksAboutApiClient} breadcrumbPath={this.state.breadcrumbPath}

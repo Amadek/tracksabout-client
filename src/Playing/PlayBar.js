@@ -5,6 +5,7 @@ import ContainerHeightProvider from '../ContainerHeightProvider';
 import TracksAboutApiClient from '../TracksAboutApiClient';
 import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
 import DynamicAlbumCoverImage from '../AlbumCoverImage/DynamicAlbumCoverImage';
+import Alert from '../Alert';
 
 export default class PlayBar extends React.Component {
   constructor (props) {
@@ -25,6 +26,7 @@ export default class PlayBar extends React.Component {
     this.handleClickPreviousButton = this._handleClickPreviousButton.bind(this);
 
     this.state = {
+      dupsko: false,
       trackProgress: 0,
       playing: false,
       playingTrackCurrentTime: new Date(0, 0, 1, 0, 0, 0).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' })
@@ -34,6 +36,11 @@ export default class PlayBar extends React.Component {
   render () {
     return (
       <div className='container-fluid bottom-0 p-0 bg-light'>
+        <Alert
+          message='DYNAMICZNY ALERT'
+          alertType='alert-secondary'
+          style={{ borderRadius: 0, position: 'fixed', width: '700px', left: 'calc(50% - 700px / 2)', bottom: '6rem' }}
+        />
         <audio
           ref={this.audioElement}
           src={this.props.tracksAboutApiClient.getStreamTrackUrl(this.props.playingQueue.getTrackToPlay()._id)}
@@ -81,6 +88,8 @@ export default class PlayBar extends React.Component {
 
   componentDidMount () {
     try {
+      this.setState({ dupsko: true });
+
       this.props.containerHeightProvider.addPlayBarHeight();
 
       this._audioElementEventListeners = this._createAudioElementEventListeners();
