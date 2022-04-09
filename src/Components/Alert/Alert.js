@@ -30,6 +30,10 @@ export default class Alert extends React.Component {
     setTimeout(() => this.setState({ visible: false }), 3000);
   }
 
+  componentWillUnmount () {
+    this.setState({ visible: false });
+  }
+
   getClassName () {
     const baseClassName = 'alert alert-dismissible fade show m-0';
     const alertType = this.props.alertType ?? 'alert-danger';

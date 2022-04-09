@@ -1,15 +1,15 @@
 import React from 'react';
 import assert from 'assert';
-import Logger from '../Logic/Logger';
-import ContainerHeightProvider from '../Logic/ContainerHeightProvider';
-import TracksAboutApiClient from '../Logic/TracksAboutApiClient';
-import AlbumImagesCache from '../Logic/AlbumImagesCache';
-import DynamicAlbumCoverImage from './AlbumCoverImage/DynamicAlbumCoverImage';
-import PreviousButton from './PlayBar/PreviousButton';
-import NextButton from './PlayBar/NextButton';
-import PlayButton from './PlayBar/PlayButton';
-import ProgressBar from './PlayBar/ProgressBar';
-import PlayBarAlert from './PlayBar/PlayBarAlert';
+import Logger from '../../Logic/Logger';
+import ContainerHeightProvider from '../../Logic/ContainerHeightProvider';
+import TracksAboutApiClient from '../../Logic/TracksAboutApiClient';
+import AlbumImagesCache from '../../Logic/AlbumImagesCache';
+import DynamicAlbumCoverImage from '../AlbumCoverImage/DynamicAlbumCoverImage';
+import PreviousButton from './PreviousButton';
+import NextButton from './NextButton';
+import PlayButton from './PlayButton';
+import ProgressBar from './ProgressBar';
+import PlayBarAlert from './PlayBarAlert';
 
 export default class PlayBar extends React.Component {
   constructor (props) {
@@ -237,10 +237,8 @@ export default class PlayBar extends React.Component {
     try {
       assert.ok(track);
       this._logger.log(this, `Handle queued track: ${track.title}`);
-      // Występują tu dwa problemy:
-      // 1. Alert nie pojawia się ponownie - problem z brakiem odswiezania reacta, bo message jest zawsze true, resetowanie message nie działa bez timoeutu.
-      // 2. Alert nie pojawia sie na pierwszym dodaniu playbara - nie wiem czy to aż taki duży problem.
-      this.setState({ alertMessage: `Track ${track.title} queued.` });
+      // We need reset alerMessage to force recreating Alert component.
+      this.setState({ alertMessage: '' }, () => { this.setState({ alertMessage: `Track ${track.title} queued.` }); });
     } catch (error) {
       this._logger.log(this, error);
     }

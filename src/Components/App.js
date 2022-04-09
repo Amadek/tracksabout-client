@@ -12,13 +12,12 @@ import ArtistTab from './ArtistTab';
 import BreadcrumbPathGenerator from './Breadcrumb/BreadcrumbPathGenerator';
 import BreadcrumbEntityData from './Breadcrumb/BreadcrumbEntityData';
 import BreadcrumbNavData from './Breadcrumb/BreadcrumbNavData';
-import PlayBar from './PlayBar';
+import PlayBar from './PlayBar/PlayBar';
 import PlayingQueue from '../Logic/PlayingQueue';
 import QueueTab from './QueueTab';
 import ContainerHeightProvider from '../Logic/ContainerHeightProvider';
 import AlbumImagesCache from '../Logic/AlbumImagesCache';
 import LoadingSite from './LoadingSite';
-import Alert from './Alert/Alert';
 
 export default class App extends React.Component {
   constructor () {
@@ -65,7 +64,6 @@ export default class App extends React.Component {
 
     return (
       <>
-        <Alert message='DUPSKO' />
         <Navbar tracksAboutApiClient={this._tracksAboutApiClient} onNavItemClick={this.handleNavItemClick} onGetUserError={this.handleGetUserError} />
         <Breadcrumbs
           tracksAboutApiClient={this._tracksAboutApiClient} breadcrumbPath={this.state.breadcrumbPath}
