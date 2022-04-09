@@ -5,7 +5,11 @@ import ContainerHeightProvider from '../Logic/ContainerHeightProvider';
 import TracksAboutApiClient from '../Logic/TracksAboutApiClient';
 import AlbumImagesCache from '../Logic/AlbumImagesCache';
 import DynamicAlbumCoverImage from './AlbumCoverImage/DynamicAlbumCoverImage';
-import Alert from './Alert/Alert';
+import PreviousButton from './PlayBar/PreviousButton';
+import NextButton from './PlayBar/NextButton';
+import PlayButton from './PlayBar/PlayButton';
+import ProgressBar from './PlayBar/ProgressBar';
+import PlayBarAlert from './PlayBar/PlayBarAlert';
 
 export default class PlayBar extends React.Component {
   constructor (props) {
@@ -19,6 +23,7 @@ export default class PlayBar extends React.Component {
     this._logger = new Logger();
     this._playingQueueHash = this.props.playingQueue.hash;
     this.props.playingQueue.onReset = this._handleQueueReset.bind(this);
+    this.props.playingQueue.onTrackQueued = this._handleTrackQueued.bind(this);
 
     this.audioElement = React.createRef();
     this.handleTogglePlayButton = this._handleTogglePlayButton.bind(this);
@@ -26,7 +31,7 @@ export default class PlayBar extends React.Component {
     this.handleClickPreviousButton = this._handleClickPreviousButton.bind(this);
 
     this.state = {
-      dupsko: false,
+      alertMessage: '',
       trackProgress: 0,
       playing: false,
       playingTrackCurrentTime: new Date(0, 0, 1, 0, 0, 0).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' })
@@ -36,47 +41,28 @@ export default class PlayBar extends React.Component {
   render () {
     return (
       <div className='container-fluid bottom-0 p-0 bg-light'>
-        <Alert
-          message='DYNAMICZNY ALERT'
-          alertType='alert-secondary'
-          style={{ borderRadius: 0, position: 'fixed', width: '700px', left: 'calc(50% - 700px / 2)', bottom: '6rem' }}
-        />
+        {this.state.alertMessage && <PlayBarAlert message={this.state.alertMessage} />}
         <audio
           ref={this.audioElement}
           src={this.props.tracksAboutApiClient.getStreamTrackUrl(this.props.playingQueue.getTrackToPlay()._id)}
           crossOrigin='anonymous'
         />
-        <div className='progress border-top' style={{ borderRadius: 0, height: '.25rem' }}>
-          <div className='progress-bar m-0' role='progressbar' style={{ width: this.state.trackProgress + '%', height: '.5rem' }} />
-        </div>
-
+        <ProgressBar trackProgress={this.state.trackProgress} />
         <div className='d-flex align-items-center justify-content-between'>
           <div className='w-100 d-flex align-items-center p-3'>
-            <div className='me-3 ' style={{ width: '2.5rem' }}>
-              <DynamicAlbumCoverImage albumId={this.props.playingQueue.getTrackToPlay().albumId} albumImagesCache={this.props.albumImagesCache} rotateImage={this.state.playing} />
-            </div>
+            <DynamicAlbumCoverImage
+              albumId={this.props.playingQueue.getTrackToPlay().albumId}
+              albumImagesCache={this.props.albumImagesCache}
+              rotateImage={this.state.playing}
+              className='me-3'
+              style={{ width: '2.5rem' }}
+            />
             <span>{this.props.playingQueue.getTrackToPlay().title}</span>
           </div>
           <div className='d-flex align-items-center justify-content-center'>
-            <i
-              style={{ fontSize: '2rem' }}
-              className={'bi-skip-start me-1 ' + (this.props.playingQueue.queueStartReached || this.state.playing === null ? 'text-secondary' : '')}
-              role={this.props.playingQueue.queueStartReached ? '' : 'button'}
-              onClick={this.handleClickPreviousButton}
-            />
-            {this.state.playing === null
-              ? <span className='spinner-border text-secondary' style={{ width: '2rem', height: '2rem', margin: '1.25rem .5rem' }} role='status' aria-hidden='true' />
-              : <i
-                  className={this.state.playing ? 'bi-pause' : 'bi-play-fill'}
-                  style={{ fontSize: '3rem' }} role='button'
-                  onClick={this.handleTogglePlayButton}
-                />}
-            <i
-              style={{ fontSize: '2rem' }}
-              className={'bi-skip-end ' + (this.props.playingQueue.queueEndReached || this.state.playing === null ? 'text-secondary' : '')}
-              role={this.props.playingQueue.queueEndReached ? '' : 'button'}
-              onClick={this.handleClickNextButton}
-            />
+            <PreviousButton playingQueue={this.props.playingQueue} playing={this.state.playing} onClick={this.handleClickPreviousButton} />
+            <PlayButton playing={this.state.playing} onClick={this.handleTogglePlayButton} />
+            <NextButton playingQueue={this.props.playingQueue} playing={this.state.playing} onClick={this.handleClickNextButton} />
           </div>
           <div className='w-100 text-end p-3'>
             {this.state.playingTrackCurrentTime}
@@ -88,8 +74,6 @@ export default class PlayBar extends React.Component {
 
   componentDidMount () {
     try {
-      this.setState({ dupsko: true });
-
       this.props.containerHeightProvider.addPlayBarHeight();
 
       this._audioElementEventListeners = this._createAudioElementEventListeners();
@@ -244,6 +228,19 @@ export default class PlayBar extends React.Component {
 
       this._logger.log(this, 'Playing track from reset queue.');
       this.audioElement.current.play().catch(err => this._logger.log(this, err));
+    } catch (error) {
+      this._logger.log(this, error);
+    }
+  }
+
+  _handleTrackQueued (track) {
+    try {
+      assert.ok(track);
+      this._logger.log(this, `Handle queued track: ${track.title}`);
+      // Występują tu dwa problemy:
+      // 1. Alert nie pojawia się ponownie - problem z brakiem odswiezania reacta, bo message jest zawsze true, resetowanie message nie działa bez timoeutu.
+      // 2. Alert nie pojawia sie na pierwszym dodaniu playbara - nie wiem czy to aż taki duży problem.
+      this.setState({ alertMessage: `Track ${track.title} queued.` });
     } catch (error) {
       this._logger.log(this, error);
     }

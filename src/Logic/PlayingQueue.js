@@ -13,10 +13,12 @@ export default class PlayingQueue {
     this._queueEndReached = true;
 
     this.onReset = () => {};
+    this.onTrackQueued = track => {};
   }
 
   addToQueue (track) {
     this._tracksQueue.push(track);
+    this.onTrackQueued(track);
     if (this._tracksQueue.length > 1) this._queueEndReached = false;
   }
 
