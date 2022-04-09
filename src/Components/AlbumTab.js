@@ -1,12 +1,12 @@
 import React from 'react';
 import assert from 'assert';
-import Logger from '../Logger';
-import Alert from '../Alert';
-import TracksTable from '../TracksTable';
-import ContainerHeightProvider from '../ContainerHeightProvider';
-import TracksAboutApiClient from '../TracksAboutApiClient';
-import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
-import DynamicAlbumCoverImage from '../AlbumCoverImage/DynamicAlbumCoverImage';
+import Logger from '../Logic/Logger';
+import Alert from '../Components/Alert/Alert';
+import TracksTable from '../Components/TracksTable';
+import ContainerHeightProvider from '../Logic/ContainerHeightProvider';
+import TracksAboutApiClient from '../Logic/TracksAboutApiClient';
+import AlbumImagesCache from '../Logic/AlbumImagesCache';
+import DynamicAlbumCoverImage from './AlbumCoverImage/DynamicAlbumCoverImage';
 
 export default class AlbumTab extends React.Component {
   constructor (props) {

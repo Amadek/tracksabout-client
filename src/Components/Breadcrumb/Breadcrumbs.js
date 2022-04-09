@@ -1,6 +1,6 @@
 import React from 'react';
 import assert from 'assert';
-import Logger from '../Logger';
+import Logger from '../../Logic/Logger';
 import BreadcrumbNavData from './BreadcrumbNavData';
 import BreadcrumbEntityData from './BreadcrumbEntityData';
 

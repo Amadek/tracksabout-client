@@ -1,13 +1,13 @@
 import React from 'react';
-import Logger from '../Logger';
+import Logger from '../../Logic/Logger';
 import LoadingTrack from './LoadingTrack';
 import FileBox from './FileBox';
 import ProcessTracksButton from './ProcessTracksButton';
-import TracksAboutApiClient from '../TracksAboutApiClient';
+import TracksAboutApiClient from '../../Logic/TracksAboutApiClient';
 import assert from 'assert';
 import TrackState from './TrackState';
-import Alert from '../Alert';
-import ContainerHeightProvider from '../ContainerHeightProvider';
+import Alert from '../Alert/Alert';
+import ContainerHeightProvider from '../../Logic/ContainerHeightProvider';
 
 export default class UploadTrackTab extends React.Component {
   constructor (props) {

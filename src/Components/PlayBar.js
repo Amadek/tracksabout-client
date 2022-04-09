@@ -1,11 +1,11 @@
 import React from 'react';
 import assert from 'assert';
-import Logger from '../Logger';
-import ContainerHeightProvider from '../ContainerHeightProvider';
-import TracksAboutApiClient from '../TracksAboutApiClient';
-import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
-import DynamicAlbumCoverImage from '../AlbumCoverImage/DynamicAlbumCoverImage';
-import Alert from '../Alert';
+import Logger from '../Logic/Logger';
+import ContainerHeightProvider from '../Logic/ContainerHeightProvider';
+import TracksAboutApiClient from '../Logic/TracksAboutApiClient';
+import AlbumImagesCache from '../Logic/AlbumImagesCache';
+import DynamicAlbumCoverImage from './AlbumCoverImage/DynamicAlbumCoverImage';
+import Alert from './Alert/Alert';
 
 export default class PlayBar extends React.Component {
   constructor (props) {

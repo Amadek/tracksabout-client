@@ -1,5 +1,5 @@
 import assert from 'assert';
-import Logger from '../Logger';
+import Logger from '../../Logic/Logger';
 
 export default class BreadcrumbPathGenerator {
   constructor () {

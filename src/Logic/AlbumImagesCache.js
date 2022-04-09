@@ -1,5 +1,5 @@
 import assert from 'assert';
-import TracksAboutApiClient from '../TracksAboutApiClient';
+import TracksAboutApiClient from './TracksAboutApiClient';
 
 export default class AlbumImagesCache {
   /**

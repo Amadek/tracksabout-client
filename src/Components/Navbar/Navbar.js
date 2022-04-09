@@ -1,8 +1,8 @@
 import React from 'react';
 import NavBarState from './NavbarState';
 import assert from 'assert';
-import TracksAboutApiClient from '../TracksAboutApiClient';
-import Logger from '../Logger';
+import TracksAboutApiClient from '../../Logic/TracksAboutApiClient';
+import Logger from '../../Logic/Logger';
 
 export default class Navbar extends React.Component {
   constructor (props) {

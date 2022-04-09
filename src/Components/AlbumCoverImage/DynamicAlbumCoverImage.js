@@ -1,6 +1,6 @@
-import Logger from '../Logger';
+import Logger from '../../Logic/Logger';
 import assert from 'assert';
-import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
+import AlbumImagesCache from '../../Logic/AlbumImagesCache';
 import AlbumCoverImage from './AlbumCoverImage';
 
 export default class DynamicAlbumCoverImage extends AlbumCoverImage {

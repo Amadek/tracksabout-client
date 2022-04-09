@@ -1,11 +1,11 @@
 import React from 'react';
 import assert from 'assert';
-import Logger from '../Logger';
-import Alert from '../Alert';
-import ContainerHeightProvider from '../ContainerHeightProvider';
-import TracksAboutApiClient from '../TracksAboutApiClient';
-import DynamicAlbumCoverImage from '../AlbumCoverImage/DynamicAlbumCoverImage';
-import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
+import Logger from '../Logic/Logger';
+import Alert from '../Components/Alert/Alert';
+import ContainerHeightProvider from '../Logic/ContainerHeightProvider';
+import TracksAboutApiClient from '../Logic/TracksAboutApiClient';
+import DynamicAlbumCoverImage from './AlbumCoverImage/DynamicAlbumCoverImage';
+import AlbumImagesCache from '../Logic/AlbumImagesCache';
 
 export default class ArtistTab extends React.Component {
   constructor (props) {

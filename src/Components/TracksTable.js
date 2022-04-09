@@ -1,7 +1,7 @@
 import React from 'react';
 import assert from 'assert';
-import Logger from './Logger';
-import TracksAboutApiClient from './TracksAboutApiClient';
+import Logger from '../Logic/Logger';
+import TracksAboutApiClient from '../Logic/TracksAboutApiClient';
 
 export default class TracksTable extends React.Component {
   constructor (props) {

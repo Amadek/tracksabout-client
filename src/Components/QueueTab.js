@@ -1,12 +1,12 @@
 import React from 'react';
 import assert from 'assert';
-import TracksTable from '../TracksTable';
-import Logger from '../Logger';
-import PlayingQueue from './PlayingQueue';
-import ContainerHeightProvider from '../ContainerHeightProvider';
-import DynamicAlbumCoverImage from '../AlbumCoverImage/DynamicAlbumCoverImage';
-import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
-import TracksAboutApiClient from '../TracksAboutApiClient';
+import TracksTable from './TracksTable';
+import Logger from '../Logic/Logger';
+import PlayingQueue from '../Logic/PlayingQueue';
+import ContainerHeightProvider from '../Logic/ContainerHeightProvider';
+import DynamicAlbumCoverImage from './AlbumCoverImage/DynamicAlbumCoverImage';
+import AlbumImagesCache from '../Logic/AlbumImagesCache';
+import TracksAboutApiClient from '../Logic/TracksAboutApiClient';
 
 export default class QueueTab extends React.Component {
   constructor (props) {

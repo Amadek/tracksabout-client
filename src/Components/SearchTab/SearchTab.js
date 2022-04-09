@@ -1,11 +1,11 @@
 import React from 'react';
-import Logger from '../Logger';
+import Logger from '../../Logic/Logger';
 import SearchBar from './SearchBar';
 import assert from 'assert';
 import SearchResult from './SearchResults';
-import Alert from '../Alert';
-import ContainerHeightProvider from '../ContainerHeightProvider';
-import AlbumImagesCache from '../AlbumImagesCache/AlbumImagesCache';
+import Alert from '../../Components/Alert/Alert';
+import ContainerHeightProvider from '../../Logic/ContainerHeightProvider';
+import AlbumImagesCache from '../../Logic/AlbumImagesCache';
 
 export default class SearchTab extends React.Component {
   constructor (props) {

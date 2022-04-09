@@ -1,4 +1,4 @@
-import packageInfo from '../package.json';
+import packageInfo from '../../package.json';
 import debug from 'debug';
 debug.enable('*');
 debug.log = console.log.bind(this);

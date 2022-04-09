@@ -2,23 +2,23 @@ import React from 'react';
 import Navbar from './Navbar/Navbar';
 import Breadcrumbs from './Breadcrumb/Breadcrumbs';
 import UploadTrackTab from './UploadTrackTab/UploadTrackTab';
-import Logger from './Logger';
+import Logger from '../Logic/Logger';
 import assert from 'assert';
 import NavBarState from './Navbar/NavbarState';
 import SearchTab from './SearchTab/SearchTab';
-import TracksAboutApiClient from './TracksAboutApiClient';
-import AlbumTab from './AlbumTab/AlbumTab';
-import ArtistTab from './ArtistTab/ArtistTab';
+import TracksAboutApiClient from '../Logic/TracksAboutApiClient';
+import AlbumTab from './AlbumTab';
+import ArtistTab from './ArtistTab';
 import BreadcrumbPathGenerator from './Breadcrumb/BreadcrumbPathGenerator';
 import BreadcrumbEntityData from './Breadcrumb/BreadcrumbEntityData';
 import BreadcrumbNavData from './Breadcrumb/BreadcrumbNavData';
-import PlayBar from './Playing/PlayBar';
-import PlayingQueue from './Playing/PlayingQueue';
-import QueueTab from './Playing/QueueTab';
-import ContainerHeightProvider from './ContainerHeightProvider';
-import AlbumImagesCache from './AlbumImagesCache/AlbumImagesCache';
+import PlayBar from './PlayBar';
+import PlayingQueue from '../Logic/PlayingQueue';
+import QueueTab from './QueueTab';
+import ContainerHeightProvider from '../Logic/ContainerHeightProvider';
+import AlbumImagesCache from '../Logic/AlbumImagesCache';
 import LoadingSite from './LoadingSite';
-import Alert from './Alert';
+import Alert from './Alert/Alert';
 
 export default class App extends React.Component {
   constructor () {
