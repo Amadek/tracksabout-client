@@ -1,3 +1,13 @@
+# Docker run
+docker run -d \
+--mount type=bind,source="$(pwd)"/../certs,target=/certs \
+-p 3000:3000 \
+-e "HTTPS=true" \
+-e "DEBUG=tracksabout-client:*" \
+-e "SSL_CRT_FILE=../certs/localhost.crt" \
+-e "SSL_KEY_FILE=../certs/localhost.key" \
+tracksabout-client
+
 # Environment variables
 To set in _.env_ file:
 1. HTTPS=true

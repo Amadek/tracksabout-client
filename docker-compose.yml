@@ -1,0 +1,11 @@
+# Na razie to nie działa, nie można połączyć się z uruchomionym kontenerem z przeglądarki.
+# Działa przez normalny: docker run (narazie wpisany na Wiki)
+version: "3"
+services:
+  react-client:
+    container_name: "tracksabout-client"
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DEBUG=tracksabout-client:*
