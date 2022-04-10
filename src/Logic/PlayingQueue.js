@@ -13,13 +13,16 @@ export default class PlayingQueue {
     this._queueEndReached = true;
 
     this.onReset = () => {};
-    this.onTrackQueued = track => {};
+    this.onMultipleTracksQueued = tracks => {};
   }
 
-  addToQueue (track) {
-    this._tracksQueue.push(track);
-    this.onTrackQueued(track);
-    if (this._tracksQueue.length > 1) this._queueEndReached = false;
+  addMultipleToQueue (tracks) {
+    assert.ok(tracks);
+    for (const track of tracks) {
+      this._tracksQueue.push(track);
+      if (this._tracksQueue.length > 1) this._queueEndReached = false;
+    }
+    this.onMultipleTracksQueued(tracks);
   }
 
   removeFromQueue (trackId) {

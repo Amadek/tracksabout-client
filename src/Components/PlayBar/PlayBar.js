@@ -23,7 +23,7 @@ export default class PlayBar extends React.Component {
     this._logger = new Logger();
     this._playingQueueHash = this.props.playingQueue.hash;
     this.props.playingQueue.onReset = this._handleQueueReset.bind(this);
-    this.props.playingQueue.onTrackQueued = this._handleTrackQueued.bind(this);
+    this.props.playingQueue.onMultipleTracksQueued = this._handleMultipleTracksQueued.bind(this);
 
     this.audioElement = React.createRef();
     this.handleTogglePlayButton = this._handleTogglePlayButton.bind(this);
@@ -233,12 +233,16 @@ export default class PlayBar extends React.Component {
     }
   }
 
-  _handleTrackQueued (track) {
+  _handleMultipleTracksQueued (tracks) {
     try {
-      assert.ok(track);
-      this._logger.log(this, `Handle queued track: ${track.title}`);
+      assert.ok(tracks);
+      this._logger.log(this, `Handle queued ${tracks.length} tracks.`);
+      const alertMessage = tracks.length === 1
+        ? `Track ${tracks[0].title} queued.`
+        : `Queued ${tracks.length} tracks.`;
+
       // We need reset alerMessage to force recreating Alert component.
-      this.setState({ alertMessage: '' }, () => { this.setState({ alertMessage: `Track ${track.title} queued.` }); });
+      this.setState({ alertMessage: '' }, () => this.setState({ alertMessage }));
     } catch (error) {
       this._logger.log(this, error);
     }

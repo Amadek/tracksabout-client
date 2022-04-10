@@ -195,7 +195,7 @@ export default class App extends React.Component {
     try {
       assert.ok(track);
       this.state.playingQueue.reset();
-      this.state.playingQueue.addToQueue(track);
+      this.state.playingQueue.addMultipleToQueue([track]);
 
       this.setState({ playingQueue: this.state.playingQueue });
     } catch (error) {
@@ -208,9 +208,7 @@ export default class App extends React.Component {
       assert.ok(selectedTracks);
 
       this.state.playingQueue.reset();
-      for (const track of selectedTracks) {
-        this.state.playingQueue.addToQueue(track);
-      }
+      this.state.playingQueue.addMultipleToQueue(selectedTracks);
 
       this.setState({ playingQueue: this.state.playingQueue });
     } catch (error) {
@@ -222,9 +220,7 @@ export default class App extends React.Component {
     try {
       assert.ok(selectedTracks);
 
-      for (const track of selectedTracks) {
-        this.state.playingQueue.addToQueue(track);
-      }
+      this.state.playingQueue.addMultipleToQueue(selectedTracks);
 
       this.setState({ playingQueue: this.state.playingQueue });
     } catch (error) {
