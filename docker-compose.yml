@@ -1,11 +1,11 @@
-# Na razie to nie działa, nie można połączyć się z uruchomionym kontenerem z przeglądarki.
-# Działa przez normalny: docker run (narazie wpisany na Wiki)
-version: "3"
+version: "3.9"
 services:
-  react-client:
-    container_name: "tracksabout-client"
+  tracksabout-client:
     build: .
     ports:
+      # For now, app is running in development mode where app is always on 3000. It will change when production app will be accessible via nginx.
       - "3000:3000"
-    environment:
-      - DEBUG=tracksabout-client:*
+    volumes:
+      # Maps cert files from server in app to use HTTPS.
+      - ../certs:/certs
+    # WARNING! ENV variables are read from .env file which has to be copied to container - do not ignore .env in .dockerignore!
