@@ -297,7 +297,7 @@ export default class App extends React.Component {
   _handleGetUserError (errorMessage) {
     try {
       assert.ok(typeof errorMessage === 'string');
-      window.location.href = 'https://localhost:3000/';
+      window.location.href = new URL(window.location.href).origin;
     } catch (error) {
       this._logger.log(this, error);
     }

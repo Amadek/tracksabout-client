@@ -16,6 +16,8 @@ export default class TracksAboutApiClient {
 
       // If user come from auth redirect, we save JWT token fom URL to memory.
       // Otherwise we redirect to authorize in API which redirect us back with JWT token in query params in URL.
+      // TODO wpada tutaj w pętle dla domeny tracksabout.com - nie wiem dlaczego, trzeba w konsoli wyswietlic jaki jest ten window.location.href
+      // bo inaczej github ostatecznie blokuje uwierzytelnienie. ;)
       const locationUrl = new URL(window.location.href);
       if (locationUrl.searchParams.has('jwt')) {
         this._jwt = locationUrl.searchParams.get('jwt');
@@ -24,7 +26,7 @@ export default class TracksAboutApiClient {
 
       const authUrl = new URL(`${this._tracksAboutApiUrl}/auth`);
       authUrl.searchParams.append('client_id', '0a1f813f4e2156f6e862');
-      authUrl.searchParams.append('redirect_url', 'https://localhost:3000');
+      authUrl.searchParams.append('redirect_url', new URL(window.location.href).origin);
 
       window.location.href = authUrl.href;
       return { redirect: true };
