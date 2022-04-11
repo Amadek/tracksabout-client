@@ -18,12 +18,13 @@ import QueueTab from './QueueTab';
 import ContainerHeightProvider from '../Logic/ContainerHeightProvider';
 import AlbumImagesCache from '../Logic/AlbumImagesCache';
 import LoadingSite from './LoadingSite';
+import Config from '../Config';
 
 export default class App extends React.Component {
   constructor () {
     super();
     this._logger = new Logger();
-    this._tracksAboutApiClient = new TracksAboutApiClient(new Logger());
+    this._tracksAboutApiClient = new TracksAboutApiClient(new Logger(), new Config());
     this._breadcrumbPathGenerator = new BreadcrumbPathGenerator();
     this._albumImagesCache = new AlbumImagesCache(this._tracksAboutApiClient);
     this.handleNavItemClick = this._handleNavItemClick.bind(this);
@@ -53,13 +54,13 @@ export default class App extends React.Component {
   }
 
   render () {
+    if (this.state.getUserErrorMessage) {
+      return <h1>{this.state.getUserErrorMessage}</h1>;
+    }
+
     const authResult = this._tracksAboutApiClient.auth();
     if (authResult.redirect) {
       return <LoadingSite />;
-    }
-
-    if (this.state.getUserErrorMessage) {
-      return <h1>{this.state.getUserErrorMessage}</h1>;
     }
 
     return (
@@ -297,7 +298,7 @@ export default class App extends React.Component {
   _handleGetUserError (errorMessage) {
     try {
       assert.ok(typeof errorMessage === 'string');
-      window.location.href = new URL(window.location.href).origin;
+      this.setState({ getUserErrorMessage: errorMessage });
     } catch (error) {
       this._logger.log(this, error);
     }

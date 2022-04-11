@@ -50,6 +50,7 @@ export default class Navbar extends React.Component {
       const getUserResult = await this.props.tracksAboutApiClient.getUser();
       if (!getUserResult.success) {
         this.props.onGetUserError(getUserResult.message);
+        return;
       }
 
       this.setState({ user: getUserResult.user });

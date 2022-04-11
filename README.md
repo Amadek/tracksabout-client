@@ -11,9 +11,10 @@ tracksabout-client
 # Environment variables
 To set in _.env_ file:
 1. HTTPS=true
-1. DEBUG=tracksabout-client:*
 1. SSL_CRT_FILE=../certs/localhost.crt
    SSL_KEY_FILE=../certs/localhost.key
+1. REACT_APP_TRACKSABOUT_API_URL=api.example.com
+1. DEBUG=tracksabout-client:*
 
 # Getting Started with Create React App
 

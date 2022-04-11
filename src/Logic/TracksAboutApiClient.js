@@ -1,11 +1,13 @@
 /* global FormData, fetch */
 /* eslint no-redeclare: 'off' */
 import assert from 'assert';
+import Config from '../Config';
 
 export default class TracksAboutApiClient {
-  constructor (logger) {
+  constructor (logger, config) {
     assert.ok(logger); this._logger = logger;
-    this._tracksAboutApiUrl = 'https://localhost:4000';
+    assert.ok(config instanceof Config);
+    this._config = config;
     this._jwt = null;
   }
 
@@ -16,15 +18,14 @@ export default class TracksAboutApiClient {
 
       // If user come from auth redirect, we save JWT token fom URL to memory.
       // Otherwise we redirect to authorize in API which redirect us back with JWT token in query params in URL.
-      // TODO wpada tutaj w pętle dla domeny tracksabout.com - nie wiem dlaczego, trzeba w konsoli wyswietlic jaki jest ten window.location.href
-      // bo inaczej github ostatecznie blokuje uwierzytelnienie. ;)
       const locationUrl = new URL(window.location.href);
       if (locationUrl.searchParams.has('jwt')) {
         this._jwt = locationUrl.searchParams.get('jwt');
         return { redirect: false };
       }
 
-      const authUrl = new URL(`${this._tracksAboutApiUrl}/auth`);
+      const authUrl = new URL(`${this._config.tracksAboutApiUrl}/auth`);
+      // TODO AP to client id też trzeba przenieść do konfiga
       authUrl.searchParams.append('client_id', '0a1f813f4e2156f6e862');
       authUrl.searchParams.append('redirect_url', new URL(window.location.href).origin);
 
@@ -37,7 +38,7 @@ export default class TracksAboutApiClient {
 
   async getUser () {
     try {
-      const getUserUrl = new URL(`${this._tracksAboutApiUrl}/user`);
+      const getUserUrl = new URL(`${this._config.tracksAboutApiUrl}/user`);
       getUserUrl.searchParams.append('jwt', this._jwt);
 
       const response = await fetch(getUserUrl.href, { method: 'GET' });
@@ -66,7 +67,7 @@ export default class TracksAboutApiClient {
     formData.append('tracks', file);
 
     try {
-      const response = await fetch(`${this._tracksAboutApiUrl}/track/validate`, {
+      const response = await fetch(`${this._config.tracksAboutApiUrl}/track/validate`, {
         method: 'POST',
         body: formData
       });
@@ -92,7 +93,7 @@ export default class TracksAboutApiClient {
     this._logger.log(this, 'Getting cover for album id: ' + albumId);
 
     try {
-      const response = await fetch(`${this._tracksAboutApiUrl}/track/cover/${albumId}`, {
+      const response = await fetch(`${this._config.tracksAboutApiUrl}/track/cover/${albumId}`, {
         method: 'GET'
       });
 
@@ -122,7 +123,7 @@ export default class TracksAboutApiClient {
     }
 
     try {
-      const uploadTracksUrl = new URL(`${this._tracksAboutApiUrl}/track`);
+      const uploadTracksUrl = new URL(`${this._config.tracksAboutApiUrl}/track`);
       uploadTracksUrl.searchParams.append('jwt', this._jwt);
 
       const response = await fetch(uploadTracksUrl.href, {
@@ -148,7 +149,7 @@ export default class TracksAboutApiClient {
     assert.ok(trackId);
 
     try {
-      const removeTrackUrl = new URL(`${this._tracksAboutApiUrl}/track/${trackId}`);
+      const removeTrackUrl = new URL(`${this._config.tracksAboutApiUrl}/track/${trackId}`);
       removeTrackUrl.searchParams.append('jwt', this._jwt);
 
       const response = await fetch(removeTrackUrl.href, {
@@ -175,7 +176,7 @@ export default class TracksAboutApiClient {
     this._logger.log(this, `Searching for phrase: ${searchPhrase} started.`);
 
     try {
-      const searchTrackUrl = new URL(`${this._tracksAboutApiUrl}/search/${searchPhrase}`);
+      const searchTrackUrl = new URL(`${this._config.tracksAboutApiUrl}/search/${searchPhrase}`);
       searchTrackUrl.searchParams.append('jwt', this._jwt);
 
       const response = await fetch(searchTrackUrl.href, { method: 'GET' });
@@ -200,7 +201,7 @@ export default class TracksAboutApiClient {
     assert.ok(guid);
 
     try {
-      const response = await fetch(`${this._tracksAboutApiUrl}/search/id/${guid}`, {
+      const response = await fetch(`${this._config.tracksAboutApiUrl}/search/id/${guid}`, {
         method: 'GET'
       });
 
@@ -222,6 +223,6 @@ export default class TracksAboutApiClient {
 
   getStreamTrackUrl (trackId) {
     assert.ok(trackId);
-    return `${this._tracksAboutApiUrl}/track/stream/${trackId}`;
+    return `${this._config.tracksAboutApiUrl}/track/stream/${trackId}`;
   }
 }

@@ -8,4 +8,5 @@ services:
     volumes:
       # Maps cert files from server in app to use HTTPS.
       - ../certs:/certs
+      - /data/www:/data/www
     # WARNING! ENV variables are read from .env file which has to be copied to container - do not ignore .env in .dockerignore!
