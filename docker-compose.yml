@@ -1,12 +1,15 @@
 version: "3.9"
 services:
   tracksabout-client:
+    # We need to setup ENV in container, --env-file sets variables only in docker-compose context.
+    # Use like: ENV_FILE=.env.production docker-compose build
+    env_file: ${ENV_FILE}
     build: .
     ports:
       # For now, app is running in development mode where app is always on 3000. It will change when production app will be accessible via nginx.
       - "3000:3000"
     volumes:
       # Maps cert files from server in app to use HTTPS.
-      - ../certs:/certs
+      - /data/certs:/data/certs
       - /data/www:/data/www
     # WARNING! ENV variables are read from .env file which has to be copied to container - do not ignore .env in .dockerignore!

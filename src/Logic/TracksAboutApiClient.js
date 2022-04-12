@@ -25,8 +25,7 @@ export default class TracksAboutApiClient {
       }
 
       const authUrl = new URL(`${this._config.tracksAboutApiUrl}/auth`);
-      // TODO AP to client id też trzeba przenieść do konfiga
-      authUrl.searchParams.append('client_id', '0a1f813f4e2156f6e862');
+      authUrl.searchParams.append('client_id', this._config.tracksAboutApiPublicKey);
       authUrl.searchParams.append('redirect_url', new URL(window.location.href).origin);
 
       window.location.href = authUrl.href;
