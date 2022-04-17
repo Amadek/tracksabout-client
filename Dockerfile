@@ -8,6 +8,4 @@ RUN npm ci
 
 COPY . .
 
-RUN npm run build
-
-CMD ["cp", "-r", "build/", "/data/www/tracksabout-client/"]
+CMD npm run build && cp -r build/* /data/www/tracksabout-client/
