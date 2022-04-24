@@ -3,10 +3,11 @@ node {
   stage ('Build') {
     checkout scm
 
-      docker.image('node').inside {
+    docker.withRegistry('https://hub.docker.com:2376') {
+      docker.image('node:16.13.1-alpine').inside {
         sh 'node --version'
       }
-
+    }
 
     // def container = docker.image('node:16-alpine')
     // def containerArgs = [
