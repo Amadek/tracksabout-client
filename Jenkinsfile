@@ -5,8 +5,8 @@ node {
 
     def container = docker.image('node:16-alpine')
     def containerArgs = [
-      "-e REACT_APP_TRACKSABOUT_API_URL=${TA_API_URL}",
-      "-e REACT_APP_TRACKSABOUT_API_PUBLIC_KEY=${TA_API_PUBLIC_KEY}"
+      "-e \"REACT_APP_TRACKSABOUT_API_URL=${TA_API_URL}\"",
+      "-e \"REACT_APP_TRACKSABOUT_API_PUBLIC_KEY=${TA_API_PUBLIC_KEY}\""
     ].join(' ')
 
     container.inside(containerArgs) {
