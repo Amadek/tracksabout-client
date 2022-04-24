@@ -9,7 +9,7 @@ node {
       "-e \"REACT_APP_TRACKSABOUT_API_PUBLIC_KEY=${TA_API_PUBLIC_KEY}\""
     ].join(' ')
 
-    container.inside(containerArgs) {
+    container.inside() {
       sh 'node --version'
       sh 'npm ci'
       sh 'npm run build'
