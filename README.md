@@ -13,25 +13,6 @@ npm start
 
 And that's it.
 
-## Run in Docker
-Docker in this project is dedicated for production or howl test environment in remote destination.
-
-Built container here is responsible for building react app in isolated environment with specific version of node.
-When react build is completed (React `npm run build` is used for that), container copies built static website to a folder `/data/www/tracksabout-client`.
-The folder is shared with containers host, from can be deployed anywere.
-
-To create TracksAbout Client container, first you have to create .env file with environemt variables (see how) in main folder repo.
-
-Next you simply:
-```sh
-docker-compose --env-file=.env.production build # Creates minified react app for production. For --env-file, .env file is default.
-docker-compose up # Copies minified react app to /data/www/tracksabout-client.
-```
-
-These commands use `docker-compose.yml` where app ports and shared volumes are defined. Docker Compose file is using .env file, which was created in earlier step.
-
-After that, app is deployed to `/data/www/tracksabout-client` folder, from it can be accesed directly from browser or e.g. NGINX server.
-
 # Environment variables
 // TODO AP lepiej to opisac jak to poustawiac.
 To set in _.env_ file:
