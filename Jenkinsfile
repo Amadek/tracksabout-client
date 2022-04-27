@@ -18,13 +18,15 @@ node {
       stage('Archive') {
         dir('build') {
           archiveArtifacts '**'
+          stash name: 'everything', includes: '**'
         }
       }
-
-      stage('Deploy') {
-        sh 'mkdir -p /data/www/tracksabout-client'
-        sh 'cp -r build/* /data/www/tracksabout-client'
-      }
     }
+  }
+
+  stage('Deploy') {
+    unstash 'everything'
+    sh 'mkdir -p /data/www/tracksabout-client'
+    sh 'cp -r * /data/www/tracksabout-client'
   }
 }
