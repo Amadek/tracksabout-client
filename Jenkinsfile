@@ -17,6 +17,7 @@ node {
     container.inside(containerArgs) {
       stage('Archive') {
         sh 'ls'
+        sh 'ls build'
         dir('build') {
           sh 'ls'
           archiveArtifacts '**'
