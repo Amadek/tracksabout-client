@@ -8,4 +8,7 @@ RUN npm ci
 
 COPY . .
 
+# Force run commands below without caching
+ARG CACHEBUST=$(date +%s)
+
 CMD npm run build
