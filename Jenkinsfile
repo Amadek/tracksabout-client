@@ -26,9 +26,5 @@ node {
 
   stage('Deploy') {
     unstash 'everything'
-    sh 'pwd'
-    sh 'ls'
-    sh 'sudo mkdir -p /data/www/tracksabout-client'
-    sh 'sudo cp -r * /data/www/tracksabout-client'
   }
 }
